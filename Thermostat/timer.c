@@ -17,7 +17,7 @@ static volatile uint16_t timer1overflowCount = 0;
 
 // Timer0 ----------------------------------------------------------
 
-void millisInit(void)
+void millis_Init(void)
 {	
 	TCCR0A |= (2<<WGM00);	// Setting Timer0 to CTC Mode
 	TCNT0 = 0;
@@ -60,35 +60,35 @@ uint32_t getTime(void) // Returns time in us
 	return (((uint32_t)timer1overflowCount << 16) | TCNT1) >> 1; // Current time in us
 }
 
-void busyDelay_us(uint32_t us) // Busy wait using NOP
-{
-	us -= 2;
-	
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP(); // 10xNOP - tested in simulation
-
-	for (; us != 0; --us) // Waiting in for loop
-	{
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP(); // 10xNOP - tested in simulation and on board
-	}
-}
+//void busyDelay_us(uint32_t us) // Busy wait using NOP
+//{
+	//us -= 2;
+	//
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP(); // 10xNOP - tested in simulation
+//
+	//for (; us != 0; --us) // Waiting in for loop
+	//{
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP(); // 10xNOP - tested in simulation and on board
+	//}
+//}
 
 void delay_us(uint32_t us) // Busy wait using timer
 {

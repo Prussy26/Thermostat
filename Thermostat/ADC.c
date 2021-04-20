@@ -10,7 +10,7 @@
  void ADC_Init(uint8_t ref)
  {
 	 ADMUX = ref; // Setting reference
-	 ADCSRA = (1<<ADEN) | (7<<ADPS0);
+	 ADCSRA |= (1<<ADPS2)|(1<<ADPS1)|(0<<ADPS0)|(1<<ADEN);
 	 /*Enable ADC | Enable Interrupt | System clock division (128)*/
 	 DIDR0 = (1<<ADC1D);	// Digital input disabled
  }
