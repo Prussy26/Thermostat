@@ -173,7 +173,14 @@ void LCD_PrintBinary(const uint16_t value, const uint8_t digits)
 
 
 /*Set the Position of the Cursor*/
-void LCD_SetPosition (const uint8_t x, const uint8_t y)
+void LCD_SetPosition(const uint8_t position)
+{
+	LCD_SendInstruction(LCD_POSITION | position);
+	delay_us(10);
+}
+
+/*Set the Position of the Cursor*/
+void LCD_SetPositionXY (const uint8_t x, const uint8_t y)
 {
 	if(x == 0) LCD_SendInstruction(LCD_POSITION | (LCD_ROW1_START + y));
 	else LCD_SendInstruction(LCD_POSITION | (LCD_ROW2_START + y));

@@ -15,8 +15,8 @@
 #include "RTC.h"
 
 
-/*-----------------------------------------------------------------------------------------*/
-/*Public Functions*/
+/*--------------------Functions--------------------*/
+/*Public*/
 
 uint8_t DECtoBCD(uint8_t dec)
 {
@@ -40,6 +40,7 @@ void RTC_Init()
 	#endif
 	
 	I2C_Init(I2C_FREQ_100K);
+	
 }
 
 /*Set Time and Date*/

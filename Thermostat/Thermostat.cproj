@@ -140,6 +140,12 @@
     <Compile Include="ADC.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Draw.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Draw.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="EEPROM.c">
       <SubType>compile</SubType>
     </Compile>

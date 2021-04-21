@@ -9,15 +9,13 @@
 
 #include "ADC.h"
 
-/*-------------------------------------------*/
-/*Constants*/
+/*--------------------Constants--------------------*/
 
 #define T0	25		// Working temperature
 #define R3	1500	// Resistance of R3
 #define VR1 20000	// Approximated resistance of trimmer VR1
 
-/*-------------------------------------------*/
-/*Variables*/
+/*--------------------Variables--------------------*/
 
 typedef struct Thermistor_t
 {
@@ -28,8 +26,7 @@ typedef struct Thermistor_t
 
 extern Thermistor_t Thermistor; 
 
-/*-------------------------------------------*/
-/*Functions*/
+/*--------------------Functions--------------------*/
 
 /*Initializing Thermistor*/
 void Thermistor_Init(uint8_t uref);

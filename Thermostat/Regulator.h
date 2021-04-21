@@ -22,7 +22,7 @@
 
 typedef enum Regulator_State_t { Idle , Cooling , Heating } Regulator_State_t;
 
-typedef enum Mode_t{ On , Cooling_Only , Heating_Only , Off , Error = 255 } Mode_t;
+typedef enum Mode_t{ On = 0 , Cooling_Only , Heating_Only , Off , Error = -1 } Mode_t;
 
 typedef struct Regulator_t
 {

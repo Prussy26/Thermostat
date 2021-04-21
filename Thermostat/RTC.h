@@ -7,18 +7,18 @@
 
 #pragma once
 
+/*--------------------PinOut--------------------*/
+
+#define DDR(PORT) (*(&PORT - 1))
+#define PIN(PORT) (*(&PORT - 2))
+
 /*Warning: Please define RTC_SQ_PORT & RTC_SQ_PIN if you want to use it*/
 #define RTC_SQ_PORT	PORTD
 #define RTC_SQ_PIN	PIND3
 
 
-/*-----------------------------------------------------------------------------------------*/
-/*Basic PORT macros*/
-#define DDR(PORT) (*(&PORT - 1))
-#define PIN(PORT) (*(&PORT - 2))
+/*--------------------Addresses--------------------*/
 
-/*-----------------------------------------------------------------------------------------*/
-/*Define Addresses*/
 #define RTC_ADDRESS	0b01101000
 
 /*Define RAM Memory Addresses*/
@@ -33,8 +33,9 @@
 
 #define RTC_ADDRESS_RAM		0x08
 
-/*-----------------------------------------------------------------------------------------*/
-/*Bits*/
+
+/*--------------------Bits--------------------*/
+
 #define RTC_CH			7
 
 #define RTC_12_24		6 
@@ -52,8 +53,9 @@
 #define RTC_SQ_8192Hz		(1<<RTC_SQWE) | (1<<RTC_RS1)
 #define RTC_SQ_32768Hz		(1<<RTC_SQWE) | (1<<RTC_RS1) | (1<<RTC_RS0)
 
-/*-----------------------------------------------------------------------------------------*/
-/*Constants*/
+
+/*--------------------Constants--------------------*/
+
 #define RTC_12			1
 #define RTC_24			0
 #define RTC_PM			1
@@ -85,44 +87,17 @@ enum
 	PM_AM	// true for PM, false for AM	
 };
 
-// typedef uint8_t Time_t[RTC_SIZE_TIME_ARRAY];
+enum { Monday = 1, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday };
 
-enum
-{
-	Monday = 1,
-	Tuesday	,    
-	Wednesday, 
-	Thursday,	
-	Friday,	
-	Saturday, 
-	Sunday
-};
+
+/*--------------------Variables--------------------*/
+
+//typedef uint8_t Time_t[RTC_SIZE_TIME_ARRAY];
 
 typedef uint8_t error_code;
 
-//typedef struct  {
-	//uint8_t Sec;    // 0 to 59
-	//uint8_t Min;    // 0 to 59
-	//uint8_t Hour;   // 0 to 23
-	//uint8_t Day;	// 1-7
-	//uint8_t Date;	// 1 to 31
-	//uint8_t Month;  // 1 to 12
-	//uint8_t Year;   // (20)00-(20)99
-	//
-	//// 12/24-hour clock data
-	//uint8_t PM_AM; // true for AM, false for PM
-	//uint8_t _12_24; // true for 24, false for 12 (hour clock time)
-//} Time_t;
 
-//typedef enum {
-	//RTC_FREQ_400K,
-	//RTC_FREQ_320K,
-	//RTC_FREQ_250K,
-	//RTC_FREQ_200K
-//} SQWE_Freq;
-
-/*-----------------------------------------------------------------------------------------*/
-/*Public Functions*/
+/*--------------------Functions--------------------*/
 
 uint8_t DECtoBCD(uint8_t dec);
 

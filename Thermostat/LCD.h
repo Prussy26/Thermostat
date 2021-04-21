@@ -61,9 +61,9 @@
 #define LCD_ROW1	0
 #define LCD_ROW2	1
 
-#define LCD_ROW1_START  0x00						// 1.ROW x 1.Column (0x00)
+#define LCD_ROW1_START  0x00							// 1.ROW x 1.Column (0x00)
 #define LCD_ROW1_END    LCD_COLS - 1					// 1.ROW x 16.Column (0x0F)
-#define LCD_ROW2_START  0x40						// 2.ROW x 1.Column (0x40)
+#define LCD_ROW2_START  0x40							// 2.ROW x 1.Column (0x40)
 #define LCD_ROW2_END    LCD_ROW2_START + LCD_COLS - 1	// 2.ROW x 16.Column (0x4F)
 
 #define LCD_PAGE_SIZE	0x10	// Size of Page that can be seen on LCD Display
@@ -142,7 +142,10 @@ void LCD_PrintBinary(const uint16_t value,const  uint8_t digits);
 
 
 /*Set the Position of the Cursor*/
-void LCD_SetPosition (const uint8_t x, const uint8_t y);
+void LCD_SetPosition (const uint8_t position);
+
+/*Set the Position of the Cursor*/
+void LCD_SetPositionXY (const uint8_t x, const uint8_t y);
 
 /*Shift Display to Chosen Direction (LCD_LEFT/LCD_RIGHT)*/
 void LCD_DisplayShift (const uint8_t direction, uint8_t times);
