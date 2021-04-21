@@ -40,14 +40,14 @@ void Thermistor_Init(uint8_t uref)
 	else Uref = 5000;
 }
 
-/*Returning Thermistor Temperature in °C*/
-uint16_t Thermistor_GetTemperature(uint8_t pin)
-{
-	float ADCvalue = ADC_Read(pin);
-	float U = (ADCvalue * Uref) / 1023;
-	float R = (( (U * VR1) / (Uref - U) ) - R3);
-	return (((float)Thermistor.B / ( log(R / (((float)Thermistor.R0*1000) * exp(-(float)Thermistor.B / (T0 + 273.15) ))))) - 273.15) + (Thermistor.Offset/10);
-}
+///*Returning Thermistor Temperature in °C*/
+//uint16_t Thermistor_GetTemperature(uint8_t pin)
+//{
+	//float ADCvalue = ADC_Read(pin);
+	//float U = (ADCvalue * Uref) / 1023;
+	//float R = (( (U * VR1) / (Uref - U) ) - R3);
+	//return (((float)Thermistor.B / ( log(R / (((float)Thermistor.R0*1000) * exp(-(float)Thermistor.B / (T0 + 273.15) ))))) - 273.15) + (Thermistor.Offset/10);
+//}
 
 /*Returning Thermistor Temperature in °Cx10*/
 uint16_t Thermistor_GetTemperatureX10(uint8_t pin)
