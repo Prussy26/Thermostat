@@ -56,66 +56,6 @@ void Initialization(void)
 }
 
 
-void Draw_Frame(void)
-{
-	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE0 + 4);
-	fprintf(&LCD_Stream, "°C");
-		
-	LCD_SetPosition(DRAW_STEMP);
-	fprintf(&LCD_Stream, "%u.", Regulator.Temperature / 10);
-	fprintf(&LCD_Stream, "%u°C", Regulator.Temperature - (Regulator.Temperature/10) * 10);
-	
-	LCD_SetPosition(DRAW_HOUR);
-	fprintf(&LCD_Stream, "00:00");
-	
-	LCD_SetPosition(DRAW_DATE);
-	fprintf(&LCD_Stream, "00.00.00");
-}
-
-
-
-void Draw_Temp(uint16_t temperature)
-{
-	LCD_SetPosition(DRAW_TEMP);
-	fprintf(&LCD_Stream, "%u.", temperature / 10);
-	fprintf(&LCD_Stream, "%u", temperature - (temperature/10) * 10);
-}
-
-void Draw_Minutes(uint8_t *Time)
-{
-	LCD_SetPosition(DRAW_MIN);
-	fprintf(&LCD_Stream, "%u", Time[Min]);
-}
-
-void Draw_Hours(uint8_t *Time)
-{
-	LCD_SetPosition(DRAW_HOUR);
-	fprintf(&LCD_Stream, "%u", Time[Hour]);
-}
-
-//void Draw_Day(uint8_t *Time)
-//{
-	//LCD_SetPosition(DRAW_DAY);
-	//fprintf(&LCD_Stream, "%u", Time[Day]);
-//}
-
-void Draw_Date(uint8_t *Time)
-{
-	LCD_SetPosition(DRAW_DATE);
-	fprintf(&LCD_Stream, "%u", Time[Date]);
-}
-
-void Draw_Month(uint8_t *Time)
-{
-	LCD_SetPosition(DRAW_MONTH);
-	fprintf(&LCD_Stream, "%u", Time[Month]);
-}
-
-void Draw_Year(uint8_t *Time)
-{
-	LCD_SetPosition(DRAW_YEAR);
-	fprintf(&LCD_Stream, "%u", Time[Year]);
-}
 
 
 void Periodic_Tasks_Set(uint8_t *Time)
