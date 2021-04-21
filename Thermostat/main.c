@@ -49,6 +49,7 @@ int main(void)
 void Initialization(void)
 {
 	Thermistor_Init(AVCC);
+	Regulator_Init();
 	LCD_Init();
 	
 }
