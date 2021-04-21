@@ -12,19 +12,23 @@
 #include "Thermistor.h"
 #include "ADC.h"
 
+/*-----------------------------------------------------------*/
+/*Private*/
+
+/*-------------------------------------------*/
+/*Variables*/
+
 volatile uint16_t Uref = 0;
 
-struct Thermistor_parameters
-{
-	float R0;	// Resistance of NTC thermistor at 25°C
-	float B;	// Beta in Kelvins
-	uint8_t Offset; // Offset in (°C x 10)
-};
-
-struct Thermistor_parameters Thermistor = { 10000, 3895, 0};
-
-
 /*-----------------------------------------------------------*/
+/*Public*/
+
+/*-------------------------------------------*/
+/*Variables*/
+
+Thermistor_t Thermistor = { 10, 3895, 0};
+
+/*-------------------------------------------*/
 /*Functions*/
 
 /*Initializing Thermistor*/
@@ -42,7 +46,7 @@ uint16_t Thermistor_GetTemperature(uint8_t pin)
 	float ADCvalue = ADC_Read(pin);
 	float U = (ADCvalue * Uref) / 1023;
 	float R = (( (U * VR1) / (Uref - U) ) - R3);
-	return ((Thermistor.B / ( log(R / (Thermistor.R0 * exp(-Thermistor.B / (T0 + 273.15) ))))) - 273.15);
+	return (((float)Thermistor.B / ( log(R / (((float)Thermistor.R0*1000) * exp(-(float)Thermistor.B / (T0 + 273.15) ))))) - 273.15) + (Thermistor.Offset/10);
 }
 
 /*Returning Thermistor Temperature in °Cx10*/
@@ -51,5 +55,5 @@ uint16_t Thermistor_GetTemperatureX10(uint8_t pin)
 	float ADCvalue = ADC_Read(pin);
 	float U = (ADCvalue * Uref) / 1023;
 	float R = (( (U * VR1) / (Uref - U) ) - R3);
-	return 10 * ((Thermistor.B / ( log(R / (Thermistor.R0 * exp(-Thermistor.B / (T0 + 273.15) ))))) - 273.15);
+	return (10 * (((float)Thermistor.B / ( log(R / (((float)Thermistor.R0*1000) * exp(-(float)Thermistor.B / (T0 + 273.15) ))))) - 273.15)) + Thermistor.Offset;
 }

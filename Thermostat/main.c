@@ -14,6 +14,7 @@ void Initialization(void);
 int main(void)
 {
 	Initialization();
+	//Thermistor.B = 4000;
 	
 	//LCD_DrawChar(0x7E);
 	//LCD_SetPosition(0,1);
@@ -36,7 +37,7 @@ int main(void)
     while (1) 
     {
 		uint16_t Temperature  = Thermistor_GetTemperatureX10(ADCP1);
-		LCD_SetPosition(0,0);
+		LCD_SetPosition(0, LCD_PAGE0 + 0);
 		fprintf(&LCD_Stream, "%u.", Temperature / 10);
 		fprintf(&LCD_Stream, "%u", Temperature - (Temperature/10) * 10);
 		fprintf(&LCD_Stream, "°C   15:48 ?");
