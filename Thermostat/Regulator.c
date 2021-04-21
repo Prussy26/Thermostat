@@ -13,9 +13,10 @@
 /*--------------------Variables--------------------*/
 /*Public*/
 
-Regulator_t Regulator = { 200 , 4 , Off }; // Initializing Regulator Variables to implicit values
+Regulator_t Regulator = { 200 , 4 , On }; // Initializing Regulator Variables to implicit values
 	
 /*Private*/
+Regulator_State_t Regulator_State = Idle;
 
 /*--------------------Macros--------------------*/
 
@@ -26,17 +27,30 @@ Regulator_t Regulator = { 200 , 4 , Off }; // Initializing Regulator Variables t
 /*--------------------Functions--------------------*/
 /*Private*/
 
-void Regulator_Heat(void)
-{
-	Regulator_OFF();
-	Regulator_HEAT();
-}
-
 void Regulator_Cool(void)
 {
-	Regulator_OFF();
-	Regulator_COOL();
+	if((Regulator.Mode == On) || (Regulator.Mode == Cooling_Only))
+	{
+		Regulator_COOL();
+		Regulator_State = Cooling;
+	}
 }
+
+void Regulator_Idle(void)
+{
+	Regulator_OFF();
+	Regulator_State = Idle;
+}
+
+void Regulator_Heat(void)
+{
+	if((Regulator.Mode == On) || (Regulator.Mode == Heating_Only))
+	{
+		Regulator_HEAT();
+		Regulator_State = Heating;
+	}
+}
+
 
 /*Public*/
 
@@ -45,64 +59,40 @@ void Regulator_Init(void)
 {
 	/*Setting output pins*/
 	DDR(REGULATOR_PORT) |= (1<<REGULATOR_COOL_PIN) | (1<<REGULATOR_HEAT_PIN);
-	Regulator_OFF();		// Turning off heating and cooling	
-	Regulator.State = Off;	// Setting off State of Regulator
+	Regulator_Idle();
 }
 
-uint8_t Regulator_Regulate(uint16_t temperature)
+/*Set Regulator to desired state according to input temperature*/
+Regulator_State_t Regulator_Regulate(uint16_t temperature)
 {
-	switch(Regulator.State)
+	if(Regulator.Mode != Off) // Regulate only if regulation is turned on
 	{
-		case Off: // 
-			if(temperature >= Regulator.Temperature + Regulator.Hysteresis)
-			{
-				Regulator_Cool();
-				Regulator.State = Cooling;
-			}
-			else if(temperature <= Regulator.Temperature - Regulator.Hysteresis)
-			{
-				Regulator_Heat();
-				Regulator.State = Heating;
-			}
-			else 
-			{
-				Regulator_OFF();
-				Regulator.State = Off;
-			}
-		break;
-		
-		case Cooling:
-			if(temperature >= Regulator.Temperature)
-			{
-				Regulator_Cool();
-				Regulator.State = Cooling;
-			}
-			else
-			{
-				Regulator_OFF();
-				Regulator.State = Off;
-			}
-		break;
-		
-		case Heating:
-			if(temperature <= Regulator.Temperature)
-			{
-				Regulator_Heat();
-				Regulator.State = Heating;
-			}
-			else
-			{
-				Regulator_OFF();
-				Regulator.State = Off;
-			}
-		break;
-		
-		/*Regulator is in different state return Error state*/
-		default:
-			Regulator_OFF();
-			Regulator.State = Error;
-		break;		
+		switch(Regulator_State)
+		{
+			case Idle:
+				if(temperature >= Regulator.Temperature + Regulator.Hysteresis)
+					Regulator_Cool();
+				else if(temperature <= Regulator.Temperature - Regulator.Hysteresis)
+					Regulator_Heat();
+			break;
+			
+			case Cooling:
+				if(temperature <= Regulator.Temperature)
+					Regulator_Idle();
+			break;
+			
+			case Heating:
+				if(temperature >= Regulator.Temperature)
+					Regulator_Idle();
+			break;
+			
+			/*Regulator is in different state return Error state*/
+			default:
+				Regulator_Idle();
+				Regulator_State = Error;
+			break;
+		}
 	}
-	
-	return Regulator.State;
+		
+	return Regulator_State;
 }

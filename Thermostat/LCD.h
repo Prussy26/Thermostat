@@ -58,6 +58,9 @@
 #define LCD_COLS    16			// 16 x 2 LCD display
 #define LCD_ROWS    2
 
+#define LCD_ROW1	0
+#define LCD_ROW2	1
+
 #define LCD_ROW1_START  0x00						// 1.ROW x 1.Column (0x00)
 #define LCD_ROW1_END    LCD_COLS - 1					// 1.ROW x 16.Column (0x0F)
 #define LCD_ROW2_START  0x40						// 2.ROW x 1.Column (0x40)
