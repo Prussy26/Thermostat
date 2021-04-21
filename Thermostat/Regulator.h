@@ -20,10 +20,13 @@
 
 /*--------------------Variables--------------------*/
 
+typedef enum State_t{ Off , Cooling , Heating , Error } State_t;
+
 typedef struct Regulator_t
 {
 	uint16_t Temperature;	// Regulation desired temperature in (10 x °C)
 	uint8_t Hysteresis;	// Hysteresis of relay regulation
+	State_t State;
 } Regulator_t;
 
 extern Regulator_t Regulator;
@@ -32,3 +35,6 @@ extern Regulator_t Regulator;
 
 /*Initializing Regulator*/
 void Regulator_Init(void);
+
+/*Set Regulator to desired state according to input temperature*/
+uint8_t Regulator_Regulate(uint16_t temperature);

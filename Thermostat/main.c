@@ -7,6 +7,7 @@
 
 #include <avr/io.h>
 #include "Thermistor.h"
+#include "Regulator.h"
 #include "LCD.h"
 
 void Initialization(void);
@@ -43,6 +44,10 @@ int main(void)
 		fprintf(&LCD_Stream, "°C   15:48 ?");
 		LCD_SetPosition(1,0);
 		fprintf(&LCD_Stream, "22.2°C  20.04.21");
+		
+		Regulator_Regulate(Temperature);
+		
+		delay_us(1000000);
     }
 }
 
@@ -50,6 +55,7 @@ void Initialization(void)
 {
 	Thermistor_Init(AVCC);
 	Regulator_Init();
+	Regulator.Temperature = 220;
 	LCD_Init();
 	
 }
