@@ -10,19 +10,12 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include "Bit.h"
-
 #include "Thermistor.h"
 #include "Regulator.h"
-#include "RTC.h"
-#include "Encoder.h"
-#include "LCD.h"
-#include "Draw.h"
-
 
 /*--------------------Registers--------------------*/
 
-volatile uint8_t PTR = 0xFF; // Periodic Tasks Register : Every Minute, Hourly, Daily, Weekly, Monthly, Yearly
+extern uint8_t PTR; // Periodic Tasks Register : Every Minute, Hourly, Daily, Weekly, Monthly, Yearly
 
 // Periodic Tasks Register Bits
 #define PTREN		0	// Enable Bit
@@ -37,25 +30,27 @@ volatile uint8_t PTR = 0xFF; // Periodic Tasks Register : Every Minute, Hourly, 
 
 /*--------------------Variables--------------------*/
 
-typedef struct Thermostat_t
-{
-	uint16_t Temperature;	// ActualTemperature
-	uint8_t State;			// State of Thermostat
-	uint8_t Menu_i;			// Menu index
-	uint8_t *Time;			// Actual time
-} Thermostat_t;
-
-enum State { Default_State , TempSet_State , Menu_State , TimeSet_State , ThermistorOffSet_State , ProgramsSet_State , Error_State};
-	
-enum Menu_i { Time = 0 , Temperature , Programs , Hysteresis , Brightness};
-	
 typedef struct ThermostatParameters_t
 {
 	Thermistor_t Thermistor;	// Thermistor parameters
 	Regulator_t Regulator;		// Regulator parameters
 	//Program_t Program;		// Daily programs
-	//uint8_t Brightness;		// Brightness of LCD
+	uint8_t Brightness;		// Brightness of LCD
 } ThermostatParameters_t;
+
+typedef struct Thermostat_t
+{
+	uint16_t Temperature;	// ActualTemperature
+	uint8_t State;			// State of Thermostat
+	uint8_t Time_i;			// Time index
+	uint8_t Menu_i;			// Menu index
+	uint8_t *Time;			// Actual time
+	ThermostatParameters_t *Parameters; 
+} Thermostat_t;
+
+enum State { Default_State , TempSet_State , Menu_State , TimeSet_State , ThermistorOffSet_State , ProgramsSet_State , Hysteresis_State, Brightness_State ,  Error_State};
+	
+	
 
 /*--------------------Macros--------------------*/
 

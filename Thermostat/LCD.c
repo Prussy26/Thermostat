@@ -171,7 +171,7 @@ void LCD_DrawChar (const char character)
 /*Put Character into Stream*/
 int LCD_Putchar(const char c, FILE *stream)
 {
-	if (c == '\n') LCD_Putchar('\r', stream);
+	if ((c == '\n') || (c == '\0')) LCD_Putchar('\r', stream);
 	if (c == '°') LCD_DrawChar(0xDF);
 	else LCD_DrawChar(c);
 	return 0;
@@ -204,7 +204,7 @@ void LCD_SetPositionXY (const uint8_t x, const uint8_t y)
 /*Shift Display to Chosen Position*/
 void LCD_GoTo (const uint8_t position)
 {
-	if((position > 0x00) && (position < 0x80))
+	if((position >= 0x00) && (position <= 0x80))
 	{
 		if(LCD_DisplayPosition > position)
 			LCD_DisplayShift(LCD_RIGHT, LCD_DisplayPosition - position);

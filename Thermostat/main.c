@@ -5,7 +5,16 @@
  * Author : xprusa06
  */ 
 
+
+#include "Bit.h"
+
 #include "Thermostat.h"
+#include "Thermistor.h"
+#include "Regulator.h"
+#include "RTC.h"
+#include "Encoder.h"
+#include "LCD.h"
+#include "Draw.h"
 
 int main(void)
 {
@@ -18,96 +27,13 @@ int main(void)
 	//fprintf(&LCD_Stream, "Brightness 100%%");
 	
 	Thermostat_t *Thermostat = {0};
+	Thermostat->Menu_i = 0;
 	Thermostat->State = Default_State;
 		
     while (1) 
     {	
 		
 		
-		
-		//switch(Thermostat->State)
-		//{
-			//case Default_State:
-				//switch(Encoder_Get())
-				//{
-					//case Short_Press:
-						//Thermostat->State = Temp_Set;
-						//LCD_SetPosition(DRAW_ICON);
-						//fprintf(&LCD_Stream, " ");
-						//LCD_CursorSwitch(1);
-						//LCD_CursorBlink(1);
-					//break;
-					//
-					//case Long_Press:
-						//Thermostat->State = Menu;
-					//break;
-					//
-					//default:
-					//break;
-				//}
-			//break;
-			//
-			//case Temp_Set:
-				//LCD_SetPosition(DRAW_STEMP + 3);
-			//
-				//switch(Encoder_Get())
-				//{
-					//case Short_Press:
-						//Thermostat->State = Normal;
-						//LCD_CursorBlink(0);
-						//LCD_CursorSwitch(0);
-					//break;
-					//
-					//case Long_Press:
-						//Thermostat->State = Time_Set;
-					//break;
-					//
-					//case Shift_Left:
-						//Regulator.Temperature--;
-						//Draw_STemp(Regulator.Temperature);
-					//break;
-					//
-					//case Shift_Right:
-						//Regulator.Temperature++;
-						//Draw_STemp(Regulator.Temperature);
-					//break;
-					//
-					//default:
-					//break;	
-				//}		
-			//break;
-			//
-			////case Menu:
-				////
-			////break;
-						//
-			//case Time_Set:
-				//
-			//break;
-			//
-			////case Thermistor_OffSet:
-			////
-			////break;
-			////
-			////case Hysteresis_Set:
-			////
-			////break;
-			////
-			////case Brightness_Set:
-			////
-			////break;
-			////
-			////case Programs_Set:
-			////
-			////break;
-			//
-			//default:
-				//LCD_SetPosition(DRAW_ICON);
-				//fprintf(&LCD_Stream, "!");
-				//
-				//Thermostat->State = Normal;
-			//break;
-		//}
 			
 		
 		Periodic_Tasks_Run(Thermostat);		
@@ -128,6 +54,7 @@ void Initialization(void)
 	RTC_SetSQ(RTC_SQ_1Hz);
 	
 	Draw_Frame();
+	
 }
 
 
@@ -211,168 +138,318 @@ void Periodic_Tasks_Run(Thermostat_t *Thermostat)
 	}
 }
 
+void To_DefaultState(Thermostat_t *Thermostat)
+{ 
+	LCD_GoTo(LCD_PAGE0);
+	LCD_CursorOFF();
+	SET_BIT(PTR,PTREN);
+
+	Thermostat->State = Default_State;
+}
+
+void To_TempSetState(Thermostat_t *Thermostat)
+{
+	LCD_SetPosition(DRAW_STEMP + 3);
+	LCD_CursorON();
+	CLR_BIT(PTR,PTREN);
+	
+	Thermostat->State = TempSet_State;
+}
+
+void To_TimeSetState(Thermostat_t *Thermostat)
+{
+	Thermostat->Time_i = 0;
+	LCD_SetPosition(Time_Position[Thermostat->Time_i]);
+	LCD_CursorON();
+	CLR_BIT(PTR,PTREN);
+	
+	Thermostat->State = TimeSet_State;
+}
+
+void To_MenuState(Thermostat_t *Thermostat)
+{
+	LCD_GoTo(LCD_PAGE1);
+	
+	Thermostat->State = Menu_State;
+}
+
 void Control(Thermostat_t *Thermostat)
 {
-	switch(Encoder_Get())
+	switch(Thermostat->State)
 	{
-		case No_Action:
-		break;
-		
-		case Short_Press:	
-			switch(Thermostat->State)
-			{	
-				// Short Press
-				case Default_State:
-					LCD_SetPosition(DRAW_STEMP + 3);
-					LCD_CursorON();
-					
-					CLR_BIT(PTR,PTREN);
-					
-					Thermostat->State = TempSet_State;
-				break;
-				
-				// Short Press
-				case TempSet_State:	
-					LCD_CursorOFF();
-					
-					SET_BIT(PTR,PTREN);
-					
-					Thermostat->State = Default_State;
+		case Default_State:
+			switch(Encoder_Get())
+			{
+				case Short_Press:
+					To_TempSetState(Thermostat);
 				break;
 			
-				//// Short Press
-				//case Menu_State:
-				//break;
-			//
-				//// Short Press
-				//case TimeSet_State:
-				//
-				//break;
-			//
-				//// Short Press
-				//case ThermistorOffSet_State:
-			//
-				//break;
-			//
-				//// Short Press
-				//case ProgramsSet_State:
-			//
-				//break;
-					
-				// Short Press
+				case Long_Press:
+					To_MenuState(Thermostat);
+				break;
+			
 				default:
 				break;
 			}
 		break;
 		
-		case Long_Press:
-			switch(Thermostat->State)
+		case TempSet_State:
+			switch(Encoder_Get())
 			{
-				case Default_State:
-				//Thermostat->State = Menu_State;
-				break;
-				
-				case TempSet_State:
-				//Thermostat->State = TimeSet_State;
-				break;
-				
-				//case Menu_State:
-				//break;
-				//
-				//case TimeSet_State:
-				//
-				//break;
-				//
-				//case ThermistorOffSet_State :
-				//
-				//break;
-				//
-				//case ProgramsSet_State:
-				//
-				//break;
-				
-				default:
-				break;
-			}
-		break;
-		
-		case Shift_Left:
-			switch(Thermostat->State)
-			{
-				case Default_State:
+				case Short_Press:
+			
+					To_DefaultState(Thermostat);
 				break;
 			
-				case TempSet_State:
+				case Long_Press:
+					To_TimeSetState(Thermostat);
+				break;
+			
+				case Shift_Left:
+				if (Regulator.Temperature > 100) // Min. 10.0 °C
+				{
 					Regulator.Temperature--;
 					Draw_STemp(Regulator.Temperature);
 					LCD_SetPosition(DRAW_STEMP + 3);
+				}
 				break;
 			
-				//case Menu_State:
-				//break;
-			//
-				//case TimeSet_State:
-			//
-				//break;
-			//
-				//case ThermistorOffSet_State :
-			//
-				//break;
-			//
-				//case ProgramsSet_State:
-			//
-				//break;
-			
-				default:
-				break;
-			}
-		break;
-		
-		case Shift_Right:
-			switch(Thermostat->State)
-			{
-				case Default_State:
-				break;
-				
-				case TempSet_State:
+				case Shift_Right:
+				if (Regulator.Temperature < 300) // Max. 30.0 °C
+				{
 					Regulator.Temperature++;
 					Draw_STemp(Regulator.Temperature);
 					LCD_SetPosition(DRAW_STEMP + 3);
+				}
 				break;
-				
-				//case Menu_State:
-				//break;
-				//
-				//case TimeSet_State:
-				//
-				//break;
-				//
-				//case ThermistorOffSet_State :
-				//
-				//break;
-				//
-				//case ProgramsSet_State:
-				//
-				//break;
-				
-				default:
+			
+				case Timeout:
+					To_DefaultState(Thermostat);
 				break;
 			}
 		break;
 		
-		case Timeout: // No Input for certain amount of Time
-			LCD_CursorOFF();
-			
-			SET_BIT(PTR,PTREN);
-			
-			Thermostat->State = Default_State;
+		
+		case Menu_State:
+			switch(Encoder_Get())
+			{
+				case Short_Press:
+									
+					//Thermostat->State = Thermostat->Menu_i + Menu_State + 1;
+				break;
+				
+				case Long_Press:
+					To_DefaultState(Thermostat);
+				break;
+				
+				case Shift_Left:
+				if (Thermostat->Menu_i > 0) 
+				{
+					Thermostat->Menu_i--;
+					Draw_Menu(Thermostat);
+				}
+				break;
+				
+				case Shift_Right:
+				if (Thermostat->Menu_i < Menu_Size - 1) 
+				{
+					Thermostat->Menu_i++;
+					Draw_Menu(Thermostat);
+				}
+				break;
+				
+				case Timeout:
+				To_DefaultState(Thermostat);
+				break;
+			}
 		break;
-	}
-	if(Thermostat->State < 0 || Thermostat->State >= Error_State)
-	{
+
+		
+		default:
 		LCD_SetPosition(DRAW_ICON);
 		fprintf(&LCD_Stream, "!");
+		
+		Thermostat->State = Default_State;
+		break;
 	}
+	//switch(Encoder_Get())
+	//{
+		//case No_Action:
+		//break;
+		//
+		//case Short_Press:	
+			//switch(Thermostat->State)
+			//{	
+				//// Short Press
+				//case Default_State:
+					//LCD_SetPosition(DRAW_STEMP + 3);
+					//LCD_CursorON();
+					//
+					//CLR_BIT(PTR,PTREN);
+					//
+					//Thermostat->State = TempSet_State;
+				//break;
+				//
+				//// Short Press
+				//case TempSet_State:	
+					//LCD_CursorOFF();
+					//
+					//SET_BIT(PTR,PTREN);
+					//
+					//Thermostat->State = Default_State;
+				//break;
+			//
+				//// Short Press
+				//case Menu_State:
+					////switch(Thermostat->Menu_i)
+					////{
+						////case Time_Set:
+							////
+						////break;
+						////
+						////case Temperature_Set:
+						////break;
+						////
+						////case Programs_Set:
+						////break;
+						////
+						////case Hysteresis_Set:
+						////break;
+						////
+						////case: Brightness_Set:
+						////break;
+					////}
+				//break;
+			////
+				////// Short Press
+				////case TimeSet_State:
+				////
+				////break;
+			////
+				////// Short Press
+				////case ThermistorOffSet_State:
+			////
+				////break;
+			////
+				////// Short Press
+				////case ProgramsSet_State:
+			////
+				////break;
+					//
+				//// Short Press
+				//default:
+				//break;
+			//}
+		//break;
+		//
+		//case Long_Press:
+			//switch(Thermostat->State)
+			//{
+				//case Default_State:
+				////Thermostat->State = Menu_State;
+				//break;
+				//
+				//case TempSet_State:
+				////Thermostat->State = TimeSet_State;
+				//break;
+				//
+				////case Menu_State:
+				////break;
+				////
+				////case TimeSet_State:
+				////
+				////break;
+				////
+				////case ThermistorOffSet_State :
+				////
+				////break;
+				////
+				////case ProgramsSet_State:
+				////
+				////break;
+				//
+				//default:
+				//break;
+			//}
+		//break;
+		//
+		//case Shift_Left:
+			//switch(Thermostat->State)
+			//{
+				//case Default_State:
+				//break;
+			//
+				//case TempSet_State:
+					//Regulator.Temperature--;
+					//Draw_STemp(Regulator.Temperature);
+					//LCD_SetPosition(DRAW_STEMP + 3);
+				//break;
+			//
+				////case Menu_State:
+				////break;
+			////
+				////case TimeSet_State:
+			////
+				////break;
+			////
+				////case ThermistorOffSet_State :
+			////
+				////break;
+			////
+				////case ProgramsSet_State:
+			////
+				////break;
+			//
+				//default:
+				//break;
+			//}
+		//break;
+		//
+		//case Shift_Right:
+			//switch(Thermostat->State)
+			//{
+				//case Default_State:
+				//break;
+				//
+				//case TempSet_State:
+					//Regulator.Temperature++;
+					//Draw_STemp(Regulator.Temperature);
+					//LCD_SetPosition(DRAW_STEMP + 3);
+				//break;
+				//
+				////case Menu_State:
+				////break;
+				////
+				////case TimeSet_State:
+				////
+				////break;
+				////
+				////case ThermistorOffSet_State :
+				////
+				////break;
+				////
+				////case ProgramsSet_State:
+				////
+				////break;
+				//
+				//default:
+				//break;
+			//}
+		//break;
+		//
+		//case Timeout: // No Input for certain amount of Time
+			//LCD_CursorOFF();
+			//
+			//SET_BIT(PTR,PTREN);
+			//
+			//Thermostat->State = Default_State;
+		//break;
+	//}
+	//if(Thermostat->State < 0 || Thermostat->State >= Error_State)
+	//{
+		//LCD_SetPosition(DRAW_ICON);
+		//fprintf(&LCD_Stream, "!");
+	//}
 }
 
 

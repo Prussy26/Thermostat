@@ -7,10 +7,27 @@
 
 #include <avr/io.h>
 
-#include "Regulator.h"
-#include "RTC.h"
-#include "LCD.h"
+
 #include "Draw.h"
+#include "Thermostat.h"
+#include "Regulator.h"
+#include "LCD.h"
+#include "RTC.h"
+
+/*--------------------Variables--------------------*/
+
+uint8_t Time_Position[5] = { DRAW_MIN, DRAW_HOUR, DRAW_DATE, DRAW_MONTH, DRAW_YEAR };
+//uint8_t Time_Position[5] { DRAW_MIN, DRAW_HOUR, DRAW_DATE, DRAW_MONTH, DRAW_YEAR};
+
+
+char Menu_Text[5][LCD_COLS] = {
+	"Time & Date    \0",
+	"Temperature    \0",
+	"Program        \0",
+	"Hysteresis \0",
+	"Brightness \0"
+};
+
 
 /*--------------------Functions--------------------*/
 /*Public*/
@@ -30,6 +47,14 @@ void Draw_Frame(void)
 	
 	LCD_SetPosition(DRAW_DATE);
 	fprintf(&LCD_Stream, "00.00.00");
+	
+	/*Draw Menu*/
+	//LCD_GoTo(LCD_PAGE1);
+	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1);
+	LCD_DrawChar(0x7E);
+	fprintf(&LCD_Stream, "%s", Menu_Text[0]);
+	LCD_SetPosition(DRAW_MENU2);
+	fprintf(&LCD_Stream, "%s", Menu_Text[1]);
 }
 
 
@@ -89,4 +114,53 @@ void Draw_Year(uint8_t *Time)
 {
 	LCD_SetPosition(DRAW_YEAR);
 	fprintf(&LCD_Stream, "%02u", Time[Year]);
+}
+
+/*Draw Menu*/
+void Draw_Menu(Thermostat_t *Thermostat)
+{
+	LCD_SetPosition(DRAW_MENU1);
+	switch(Thermostat->Menu_i)
+	{
+		case Hysteresis_Set:
+		fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i]);
+		fprintf(&LCD_Stream, "%2u.", Regulator.Hysteresis / 10);
+		fprintf(&LCD_Stream, "%1u", Regulator.Hysteresis - (Regulator.Hysteresis/10) * 10);
+		break;
+		
+		case Brightness_Set:
+		fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i]);
+		fprintf(&LCD_Stream, "%3u%%", Thermostat->Parameters->Brightness);
+		break;
+		
+		case Menu_Size:
+		break;
+		
+		default:
+		fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i]);
+		break;
+	}
+	
+	LCD_SetPosition(DRAW_MENU2);
+	switch(Thermostat->Menu_i + 1)
+	{
+		case Hysteresis_Set:
+		fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i + 1]);
+		fprintf(&LCD_Stream, "%2u.", Regulator.Hysteresis / 10);
+		fprintf(&LCD_Stream, "%1u", Regulator.Hysteresis - (Regulator.Hysteresis/10) * 10);
+		break;
+		
+		case Brightness_Set:
+		fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i + 1]);
+		fprintf(&LCD_Stream, "%3u%%", Thermostat->Parameters->Brightness);
+		break;
+		
+		case Menu_Size:
+			LCD_ClearSpace(LCD_PAGE1 + LCD_ROW2_START, LCD_COLS);
+		break;
+		
+		default:
+		fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i + 1]);
+		break;
+	}
 }

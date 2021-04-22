@@ -7,7 +7,7 @@
 
 #pragma once
 
-
+#include "Thermostat.h"
 
 /*--------------------Constants--------------------*/
 
@@ -20,7 +20,16 @@
 #define DRAW_YEAR	LCD_PAGE0 + LCD_ROW2_START + 14
 #define DRAW_ICON	LCD_PAGE0 + LCD_ROW1_END
 
+#define DRAW_MENU1 LCD_PAGE1 + LCD_ROW1_START + 1
+#define DRAW_MENU2 LCD_PAGE1 + LCD_ROW2_START + 1
 
+/*--------------------Variables--------------------*/
+
+extern uint8_t Time_Position[5];
+
+enum Menu_i { Time_Set = 0 , Temperature_Set , Programs_Set , Hysteresis_Set , Brightness_Set , Menu_Size};
+
+	
 /*--------------------Functions--------------------*/
 
 /*Draw Front Frame of the LCD Display*/
@@ -49,3 +58,6 @@ void Draw_Month(uint8_t *Time);
 
 /*Draw Year*/
 void Draw_Year(uint8_t *Time);
+
+/*Draw Menu*/
+void Draw_Menu(Thermostat_t *Thermostat);
