@@ -119,6 +119,9 @@ void LCD_ReturnHome(void);
 /*Sets Incrementation/Decrementation and Accompanied Display Shift*/
 void LCD_EntryModeSet(const uint8_t increment,const  uint8_t dshift);
 
+/*Shift Display to Chosen Position*/
+void LCD_GoTo (const uint8_t position);
+
 /*Switch the Display ON/OFF (0/1)*/
 void LCD_DisplaySwitch(const uint8_t state);
 
@@ -160,6 +163,13 @@ void LCD_DisplayShift (const uint8_t direction, uint8_t times);
 void LCD_CursorShift (const uint8_t direction, uint8_t times);
 
 void LCD_BackSpace(void);
+
+/* Clear Space on display with given parameters*/
+void LCD_ClearSpace(const uint8_t offset, uint8_t size);
+
+/* Clear Space on display with given parameters*/
+void LCD_ClearPage(const uint8_t page, const uint8_t offset_left, const uint8_t offset_right);
+
 
 
 

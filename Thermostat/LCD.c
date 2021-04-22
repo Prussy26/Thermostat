@@ -12,6 +12,7 @@
 #include "ADC.h"
 #include "LCD.h"
 
+volatile uint8_t LCD_DisplayPosition = 0;
 
 /*Send 8bits Instruction in 4bit Mode*/
 void LCD_SendInstruction(const uint8_t instruction)
@@ -200,16 +201,34 @@ void LCD_SetPositionXY (const uint8_t x, const uint8_t y)
 	delay_us(20);
 }
 
+/*Shift Display to Chosen Position*/
+void LCD_GoTo (const uint8_t position)
+{
+	if((position > 0x00) && (position < 0x80))
+	{
+		if(LCD_DisplayPosition > position)
+			LCD_DisplayShift(LCD_RIGHT, LCD_DisplayPosition - position);
+		else if (LCD_DisplayPosition < position)
+			LCD_DisplayShift(LCD_LEFT, position - LCD_DisplayPosition);
+		LCD_DisplayPosition = position;
+	}
+}
+
 /*Shift Display to Chosen Direction (LCD_LEFT/LCD_RIGHT)*/
 void LCD_DisplayShift (const uint8_t direction, uint8_t times)
 {
 	if(direction == LCD_LEFT)
+	{
+		LCD_DisplayPosition += times;
 		for (; times > 0 ; times--)
 			LCD_SendInstruction(LCD_SHIFT | LCD_DISPLAY | LCD_LEFT); 
+	}
 	else if(direction == LCD_RIGHT)
+	{	
+		LCD_DisplayPosition -= times;
 		for (; times > 0 ; times--)
 			LCD_SendInstruction(LCD_SHIFT | LCD_DISPLAY | LCD_RIGHT);
-	else;
+	}
 }
 
 /*Shift Cursor to Chosen Direction (LCD_LEFT/LCD_RIGHT)*/
@@ -229,6 +248,28 @@ void LCD_BackSpace(void)
 	LCD_CursorShift(LCD_LEFT, 1);
 	LCD_DrawChar(' ');
 	LCD_CursorShift(LCD_LEFT, 1);
+}
+
+/* Clear Space on display with given parameters*/
+void LCD_ClearSpace(const uint8_t offset, uint8_t size)
+{
+	if((offset < 0x80) && (size <= 0x80))
+	{
+		LCD_SetPosition(offset);
+		for (; size > 0 ; size--)
+		LCD_DrawChar(' ');
+	}
+}
+
+
+/* Clear Space on display with given parameters*/
+void LCD_ClearPage(const uint8_t page, const uint8_t offset_left, const uint8_t offset_right)
+{
+	if((page < 0x80) && ((offset_left + offset_right) <= LCD_COLS))
+	{
+		LCD_ClearSpace(LCD_ROW1_START + page + offset_left, LCD_COLS - offset_left - offset_left);
+		LCD_ClearSpace(LCD_ROW2_START + page + offset_left, LCD_COLS - offset_left - offset_left);
+	}	
 }
 
 
