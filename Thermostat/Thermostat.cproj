@@ -140,6 +140,9 @@
     <Compile Include="ADC.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Bit.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="Draw.c">
       <SubType>compile</SubType>
     </Compile>
@@ -179,10 +182,10 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="RotaryEncoder.c">
+    <Compile Include="Encoder.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="RotaryEncoder.h">
+    <Compile Include="Encoder.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="RTC.c">

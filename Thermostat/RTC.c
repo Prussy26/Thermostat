@@ -7,7 +7,7 @@
 
 
 #include <avr/io.h>
-//#include <string.h>
+#include "Bit.h"
 
 #include "LCD.h"
 #include "USART.h"
@@ -32,12 +32,12 @@ uint8_t BCDtoDEC(uint8_t bcd)
 void RTC_Init()
 { 
 	/*Setting up SQ Pin if defined*/
-	#ifdef RTC_SQ_PORT
-		#ifdef RTC_SQ_PIN
+	//#ifdef RTC_SQ_PORT
+		//#ifdef RTC_SQ_PIN
 			DDR(RTC_SQ_PORT) &= ~(1<<RTC_SQ_PIN);
 			RTC_SQ_PORT		 |=  (1<<RTC_SQ_PIN);
-		#endif
-	#endif
+		//#endif
+	//#endif
 	
 	I2C_Init(I2C_FREQ_100K);
 	

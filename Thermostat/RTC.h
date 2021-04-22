@@ -7,11 +7,6 @@
 
 #pragma once
 
-/*--------------------PinOut--------------------*/
-
-#define DDR(PORT) (*(&PORT - 1))
-#define PIN(PORT) (*(&PORT - 2))
-
 /*Warning: Please define RTC_SQ_PORT & RTC_SQ_PIN if you want to use it*/
 #define RTC_SQ_PORT	PORTD
 #define RTC_SQ_PIN	PIND3

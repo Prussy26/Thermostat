@@ -16,9 +16,32 @@ int main(void)
 	//fprintf(&LCD_Stream, "Hysteresis 0.2");
 	//LCD_SetPosition(1,1);
 	//fprintf(&LCD_Stream, "Brightness 100%%");
-	Thermostat_t *Thermostat = NULL;
+	
+	Thermostat_t *Thermostat = {0};
     while (1) 
-    {				
+    {	
+		uint8_t Enc = Encoder_Get();
+		if(Enc == No_Action);
+		else if(Enc == Short_Press)
+		{
+			LCD_SetPosition(DRAW_STEMP);
+			LCD_CursorSwitch(1);
+			LCD_CursorBlink(1);
+		}	
+		else if(Enc == Long_Press)
+		{
+			LCD_SetPosition(DRAW_TEMP);
+			LCD_CursorSwitch(1);
+			LCD_CursorBlink(1);
+		}	
+		else if(Enc == Shift_Left)
+		{
+			LCD_SetPosition(DRAW_TEMP);
+		}
+		else if(Enc == Shift_Right)
+		{
+			LCD_SetPosition(DRAW_STEMP);
+		}
 		Periodic_Tasks_Run(Thermostat);		
     }
 }
@@ -30,6 +53,7 @@ void Initialization(void)
 	Regulator_Init();
 	Regulator.Temperature = 220;
 	RTC_Init();
+	Encoder_Init();
 	LCD_Init();	
 	
 	/*Initializing SQ 1HZ Interrupt*/
@@ -39,12 +63,8 @@ void Initialization(void)
 	
 	RTC_SetSQ(RTC_SQ_1Hz);
 	
-	
-	
 	Draw_Frame();
 }
-
-
 
 
 void Periodic_Tasks_Set(uint8_t *Time)

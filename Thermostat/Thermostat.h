@@ -10,31 +10,29 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#include "Bit.h"
+
 #include "Thermistor.h"
 #include "Regulator.h"
 #include "RTC.h"
+#include "Encoder.h"
 #include "LCD.h"
 #include "Draw.h"
 
-/*--------------------Basic Macros--------------------*/
 
-#define SET_BIT(REG,BIT) (REG |=  (1<<BIT))
-#define CLR_BIT(REG,BIT) (REG &= ~(1<<BIT))
+/*--------------------Registers--------------------*/
 
-#define GET_BIT(REG,BIT) (REG & (1<<BIT))
-
-
-/*--------------------Constants--------------------*/
+volatile uint8_t PTR = 0xFF; // Periodic Tasks Register : Every Minute, Hourly, Daily, Weekly, Monthly, Yearly
 
 // Periodic Tasks Register Bits
-#define PTREN		0	// Enable
-#define PTRSEC		1	// Secondly
-#define PTRMIN		2	// Minutely
-#define PTRHOUR		3	// Hourly
-#define PTRDAY		4	// Daily
-#define PTRWEEK		5	// Weekly
-#define PTRMONTH	6	// Monthly
-#define PTRYEAR		7	// Yearly
+#define PTREN		0	// Enable Bit
+#define PTRSEC		1	// Secondly Flag
+#define PTRMIN		2	// Minutely Flag
+#define PTRHOUR		3	// Hourly Flag
+#define PTRDAY		4	// Daily Flag
+#define PTRWEEK		5	// Weekly Flag
+#define PTRMONTH	6	// Monthly Flag
+#define PTRYEAR		7	// Yearly Flag
 
 
 /*--------------------Variables--------------------*/
@@ -46,8 +44,6 @@ typedef struct Thermostat_t
 	uint8_t Menu_i;			// Menu index
 } Thermostat_t;
 
-
-volatile uint8_t PTR = 0xFF; // Periodic Tasks Register : Every Minute, Hourly, Daily, Weekly, Monthly, Yearly
 
 typedef struct ThermostatParameters_t
 {
