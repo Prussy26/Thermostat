@@ -146,6 +146,19 @@ void LCD_CursorBlink(const uint8_t state)
 	else LCD_SendInstruction(LCD_CURSOR_BLIK);
 }
 
+/*Cursor Full On*/
+void LCD_CursorON()
+{
+	LCD_SendInstruction(LCD_CURSOR_ON | LCD_CURSOR_BLIK);
+}
+
+/*Cursor Full OFF*/
+void LCD_CursorOFF()
+{
+	LCD_SendInstruction(LCD_DISPLAY_ON);
+}
+
+
 
 
 /*Draw the Input character on LCD Display at Cursor Position*/
@@ -176,7 +189,7 @@ void LCD_PrintBinary(const uint16_t value, const uint8_t digits)
 void LCD_SetPosition(const uint8_t position)
 {
 	LCD_SendInstruction(LCD_POSITION | position);
-	delay_us(10);
+	delay_us(20);
 }
 
 /*Set the Position of the Cursor*/
@@ -184,7 +197,7 @@ void LCD_SetPositionXY (const uint8_t x, const uint8_t y)
 {
 	if(x == 0) LCD_SendInstruction(LCD_POSITION | (LCD_ROW1_START + y));
 	else LCD_SendInstruction(LCD_POSITION | (LCD_ROW2_START + y));
-	delay_us(10);
+	delay_us(20);
 }
 
 /*Shift Display to Chosen Direction (LCD_LEFT/LCD_RIGHT)*/

@@ -128,6 +128,12 @@ void LCD_CursorSwitch(const uint8_t state);
 /*Cursor Blinking ON/OFF (0/1)*/
 void LCD_CursorBlink(const uint8_t state);
 
+/*Cursor Full On*/
+void LCD_CursorON();
+
+/*Cursor Full OFF*/
+void LCD_CursorOFF();
+
 
 
 /*Draw the Input character on LCD Display at Cursor Position*/

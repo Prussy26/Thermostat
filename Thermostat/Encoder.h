@@ -23,9 +23,13 @@
 #define ENCODER_PORT_BUTTON	PORTC
 #define ENCODER_BUTTON		PINC0 // PC0
 
-enum {No_Action , Short_Press , Long_Press , Shift_Left , Shift_Right };
+enum {No_Action , Short_Press , Long_Press , Shift_Left , Shift_Right , Timeout};
 
 /*Initializing Rotary Encoder M495*/
 void Encoder_Init();
 
+/* Overflow protection reset of millis*/
+void Encoder_millisCheck(void); 
+
+/* Get Encoder State */
 uint8_t Encoder_Get(void);

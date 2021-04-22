@@ -40,11 +40,15 @@ volatile uint8_t PTR = 0xFF; // Periodic Tasks Register : Every Minute, Hourly, 
 typedef struct Thermostat_t
 {
 	uint16_t Temperature;	// ActualTemperature
-	uint8_t *Time;			// Actual time
+	uint8_t State;			// State of Thermostat
 	uint8_t Menu_i;			// Menu index
+	uint8_t *Time;			// Actual time
 } Thermostat_t;
 
-
+enum State { Default_State , TempSet_State , Menu_State , TimeSet_State , ThermistorOffSet_State , ProgramsSet_State , Error_State};
+	
+enum Menu_i { Time = 0 , Temperature , Programs , Hysteresis , Brightness};
+	
 typedef struct ThermostatParameters_t
 {
 	Thermistor_t Thermistor;	// Thermistor parameters
@@ -60,6 +64,7 @@ typedef struct ThermostatParameters_t
 
 void Initialization(void);
 
+void Control(Thermostat_t *Thermostat);
 void Periodic_Tasks_Set(uint8_t* Time);
 void Periodic_Tasks_Run(Thermostat_t *Thermostat);
 

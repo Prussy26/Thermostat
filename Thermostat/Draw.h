@@ -18,6 +18,7 @@
 #define DRAW_DATE	LCD_PAGE0 + LCD_ROW2_START + 8
 #define DRAW_MONTH	LCD_PAGE0 + LCD_ROW2_START + 11
 #define DRAW_YEAR	LCD_PAGE0 + LCD_ROW2_START + 14
+#define DRAW_ICON	LCD_PAGE0 + LCD_ROW1_END
 
 
 /*--------------------Functions--------------------*/

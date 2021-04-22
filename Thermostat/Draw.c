@@ -22,7 +22,7 @@ void Draw_Frame(void)
 	fprintf(&LCD_Stream, "°C");
 	
 	LCD_SetPosition(DRAW_STEMP);
-	fprintf(&LCD_Stream, "%u.", Regulator.Temperature / 10);
+	fprintf(&LCD_Stream, "%02u.", Regulator.Temperature / 10);
 	fprintf(&LCD_Stream, "%u°C", Regulator.Temperature - (Regulator.Temperature/10) * 10);
 	
 	LCD_SetPosition(DRAW_HOUR);
@@ -37,16 +37,16 @@ void Draw_Frame(void)
 void Draw_Temp(uint16_t temperature)
 {
 	LCD_SetPosition(DRAW_TEMP);
-	fprintf(&LCD_Stream, "%u.", temperature / 10);
-	fprintf(&LCD_Stream, "%u", temperature - (temperature/10) * 10);
+	fprintf(&LCD_Stream, "%02u.", temperature / 10);
+	fprintf(&LCD_Stream, "%01u", temperature - (temperature/10) * 10);
 }
 
 /*Draw Set Temperature*/
 void Draw_STemp(uint16_t temperature)
 {
 	LCD_SetPosition(DRAW_STEMP);
-	fprintf(&LCD_Stream, "%u.", temperature / 10);
-	fprintf(&LCD_Stream, "%u", temperature - (temperature/10) * 10);
+	fprintf(&LCD_Stream, "%02u.", temperature / 10);
+	fprintf(&LCD_Stream, "%01u", temperature - (temperature/10) * 10);
 }
 
 /*Draw Minutes*/

@@ -11,8 +11,8 @@
 
 #include "timer.h"
 
-static volatile uint32_t timer0_ms = 0;
-static volatile uint16_t timer1overflowCount = 0;
+volatile uint32_t timer0_ms = 0;
+volatile uint16_t timer1overflowCount = 0;
 
 
 // Timer0 ----------------------------------------------------------

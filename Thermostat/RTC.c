@@ -7,6 +7,8 @@
 
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
+
 #include "Bit.h"
 
 #include "LCD.h"
@@ -32,15 +34,15 @@ uint8_t BCDtoDEC(uint8_t bcd)
 void RTC_Init()
 { 
 	/*Setting up SQ Pin if defined*/
-	//#ifdef RTC_SQ_PORT
-		//#ifdef RTC_SQ_PIN
-			DDR(RTC_SQ_PORT) &= ~(1<<RTC_SQ_PIN);
-			RTC_SQ_PORT		 |=  (1<<RTC_SQ_PIN);
-		//#endif
-	//#endif
+	DDR(RTC_SQ_PORT) &= ~(1<<RTC_SQ_PIN);
+	RTC_SQ_PORT		 |=  (1<<RTC_SQ_PIN);
+		
+	/*Initializing SQ 1HZ Interrupt*/
+	EIMSK |= (1<<INT1);
+	EICRA |= (1<<ISC11) | (1<<ISC10);
+	sei();	
 	
 	I2C_Init(I2C_FREQ_100K);
-	
 }
 
 /*Set Time and Date*/
