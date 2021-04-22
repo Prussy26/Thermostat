@@ -39,6 +39,14 @@
 
 /*--------------------Variables--------------------*/
 
+typedef struct Thermostat_t
+{
+	uint16_t Temperature;	// ActualTemperature
+	uint8_t *Time;			// Actual time
+	uint8_t Menu_i;			// Menu index
+} Thermostat_t;
+
+
 volatile uint8_t PTR = 0xFF; // Periodic Tasks Register : Every Minute, Hourly, Daily, Weekly, Monthly, Yearly
 
 typedef struct ThermostatParameters_t
@@ -57,5 +65,5 @@ typedef struct ThermostatParameters_t
 void Initialization(void);
 
 void Periodic_Tasks_Set(uint8_t* Time);
-void Periodic_Tasks_Run(uint8_t* Time);
+void Periodic_Tasks_Run(Thermostat_t *Thermostat);
 

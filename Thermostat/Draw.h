@@ -7,9 +7,7 @@
 
 #pragma once
 
-#include "Regulator.h"
-#include "RTC.h"
-#include "LCD.h"
+
 
 /*--------------------Constants--------------------*/
 

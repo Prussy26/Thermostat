@@ -104,6 +104,26 @@ uint8_t *RTC_GetTimeAndDate(void)
 	return TimeData;
 }
 
+/*Get Time and Date in 24h format*/
+uint8_t *RTC_GetTimeAndDate24(void)
+{
+	static uint8_t TimeData[RTC_SIZE_FULL_TIME] = {0};
+	
+	/*Dummy Write to Set Address of Memory*/
+	I2C_TransmitByte(RTC_ADDRESS, RTC_ADDRESS_SECOND, I2C_REPEATSTART);
+	
+	/*Reading Data from Memory*/
+	I2C_ReceiveData(RTC_ADDRESS, TimeData, RTC_SIZE_FULL_TIME);
+		
+	/*BCD to DEC code*/
+	for(uint8_t address = Sec ; address <= Year ; address++)
+	{
+		TimeData[address] = BCDtoDEC(TimeData[address]);
+	}
+	
+	return TimeData;
+}
+
 /*Get Time*/
 void RTC_GetTime(uint8_t *hour, uint8_t *minute, uint8_t *sec)
 {	

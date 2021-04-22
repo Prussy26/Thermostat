@@ -16,20 +16,10 @@ int main(void)
 	//fprintf(&LCD_Stream, "Hysteresis 0.2");
 	//LCD_SetPosition(1,1);
 	//fprintf(&LCD_Stream, "Brightness 100%%");
-
+	Thermostat_t *Thermostat = NULL;
     while (1) 
-    {
-		uint16_t Temperature  = Thermistor_GetTemperatureX10(ADCP1);
-		Draw_Temp(Temperature);
-		
-		Regulator_Regulate(Temperature);
-		
-		uint8_t *Time;
-		Time = RTC_GetTimeAndDate();
-		
-		Periodic_Tasks_Run(Time);
-		
-		delay_us(1000000);
+    {				
+		Periodic_Tasks_Run(Thermostat);		
     }
 }
 
@@ -40,8 +30,7 @@ void Initialization(void)
 	Regulator_Init();
 	Regulator.Temperature = 220;
 	RTC_Init();
-	//uint8_t Time[RTC_SIZE_TIME_ARRAY] = {0};
-	//RTC_SetTime(Time);
+	LCD_Init();	
 	
 	/*Initializing SQ 1HZ Interrupt*/
 	EIMSK |= (1<<INT1);
@@ -50,7 +39,7 @@ void Initialization(void)
 	
 	RTC_SetSQ(RTC_SQ_1Hz);
 	
-	LCD_Init();	
+	
 	
 	Draw_Frame();
 }
@@ -70,7 +59,7 @@ void Periodic_Tasks_Set(uint8_t *Time)
 	Time[Day]++;
 }
 
-void Periodic_Tasks_Run(uint8_t *Time)
+void Periodic_Tasks_Run(Thermostat_t *Thermostat)
 {
 	/*If Periodic Tasks are enabled*/
 	if(GET_BIT(PTR,PTREN) != 0) 
@@ -78,27 +67,31 @@ void Periodic_Tasks_Run(uint8_t *Time)
 		// Every Second Task
 		if(GET_BIT(PTR,PTRSEC) != 0)	
 		{
-			Periodic_Tasks_Set(Time);
+			Thermostat->Temperature  = Thermistor_GetTemperatureX10(ADCP1);
+			Draw_Temp(Thermostat->Temperature);			
+			Regulator_Regulate(Thermostat->Temperature);
+			Thermostat->Time = RTC_GetTimeAndDate24();
+			Periodic_Tasks_Set(Thermostat->Time);
 			
 			CLR_BIT(PTR,PTRSEC); // Task Done
 		}
 		// Every Minute Task
 		if(GET_BIT(PTR,PTRMIN) != 0)	
 		{
-			Draw_Minutes(Time);
+			Draw_Minutes(Thermostat->Time);
 			
 			CLR_BIT(PTR,PTRMIN); // Task Done
 		}
 		// Every Hour Task
 		if(GET_BIT(PTR,PTRHOUR) != 0)	
 		{
-			Draw_Hours(Time);
+			Draw_Hours(Thermostat->Time);
 			CLR_BIT(PTR,PTRHOUR); // Task Done
 		}
 		// Every Day Task
 		if(GET_BIT(PTR,PTRDAY) != 0)	
 		{
-			Draw_Date(Time);
+			Draw_Date(Thermostat->Time);
 			CLR_BIT(PTR,PTRDAY); // Task Done
 		}
 		// Every Week Task
@@ -110,13 +103,13 @@ void Periodic_Tasks_Run(uint8_t *Time)
 		// Every Month Task
 		if(GET_BIT(PTR,PTRMONTH) != 0)	
 		{
-			Draw_Month(Time);
+			Draw_Month(Thermostat->Time);
 			CLR_BIT(PTR,PTRMONTH); // Task Done
 		}
 		// Every Year Task
 		if(GET_BIT(PTR,PTRYEAR) != 0) 
 		{
-			Draw_Year(Time);
+			Draw_Year(Thermostat->Time);
 			CLR_BIT(PTR,PTRYEAR); // Task Done
 		}
 		

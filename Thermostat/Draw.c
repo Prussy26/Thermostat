@@ -7,7 +7,9 @@
 
 #include <avr/io.h>
 
-
+#include "Regulator.h"
+#include "RTC.h"
+#include "LCD.h"
 #include "Draw.h"
 
 /*--------------------Functions--------------------*/

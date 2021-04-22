@@ -112,6 +112,9 @@ void RTC_SetTime(const uint8_t *TimeData);
 /*Get Time and Date*/
 uint8_t *RTC_GetTimeAndDate(void);
 
+/*Get Time and Date in 24h format*/
+uint8_t *RTC_GetTimeAndDate24(void);
+
 /*Get Time*/
 void RTC_GetTime(uint8_t *hour, uint8_t *minute, uint8_t *sec);
 
