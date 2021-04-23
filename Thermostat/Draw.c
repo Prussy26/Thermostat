@@ -32,7 +32,7 @@ char Day_Text[7][3] = {
 };
 
 
-char Menu_Text[5][LCD_COLS] = {
+char Menu_Text[Menu_Size][LCD_COLS] = {
 	"Time & Date    \0",
 	"Temperature    \0",
 	"Program        \0",
@@ -45,20 +45,20 @@ char Menu_Text[5][LCD_COLS] = {
 /*Public*/
 
 /*Draw Front Frame of the LCD Display*/
-void Draw_Frame(void)
+void Draw_Frame(const Thermostat_t *Thermostat)
 {
 	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE0 + 4);
 	fprintf(&LCD_Stream, "°C");
 	
 	LCD_SetPosition(DRAW_STEMP);
-	fprintf(&LCD_Stream, "%02u.", Regulator.Temperature / 10);
-	fprintf(&LCD_Stream, "%1u°C", Regulator.Temperature - (Regulator.Temperature/10) * 10);
+	fprintf(&LCD_Stream, "%02u.", Thermostat->Parameters->Regulator->Temperature / 10);
+	fprintf(&LCD_Stream, "%1u°C", Thermostat->Parameters->Regulator->Temperature - (Thermostat->Parameters->Regulator->Temperature / 10) * 10);
 	
 	LCD_SetPosition(DRAW_HOUR);
 	fprintf(&LCD_Stream, "00:00");
 	
-	LCD_SetPosition(DRAW_DATE);
-	fprintf(&LCD_Stream, "00.00/Mo");
+	LCD_SetPosition(DRAW_DAY);
+	fprintf(&LCD_Stream, "Mo 00/00");
 	
 	/*Draw Menu*/
 	//LCD_GoTo(LCD_PAGE1);
@@ -203,8 +203,8 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 	{
 		case Hysteresis_Set:
 			fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i]);
-			fprintf(&LCD_Stream, "%2u.", Regulator.Hysteresis / 10);
-			fprintf(&LCD_Stream, "%1u", Regulator.Hysteresis - (Regulator.Hysteresis/10) * 10);
+			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Regulator->Hysteresis / 10);
+			fprintf(&LCD_Stream, "%1u",  Thermostat->Parameters->Regulator->Hysteresis - ( Thermostat->Parameters->Regulator->Hysteresis/10) * 10);
 		break;
 		
 		case Brightness_Set:
@@ -225,8 +225,8 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 	{
 		case Hysteresis_Set:
 			fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i + 1]);
-			fprintf(&LCD_Stream, "%2u.", Regulator.Hysteresis / 10);
-			fprintf(&LCD_Stream, "%1u", Regulator.Hysteresis - (Regulator.Hysteresis/10) * 10);
+			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Regulator->Hysteresis / 10);
+			fprintf(&LCD_Stream, "%1u", Thermostat->Parameters->Regulator->Hysteresis - (Thermostat->Parameters->Regulator->Hysteresis/10) * 10);
 		break;
 		
 		case Brightness_Set:

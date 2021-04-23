@@ -31,7 +31,7 @@ typedef struct Regulator_t
 	Mode_t Mode;
 } Regulator_t;
 
-extern Regulator_t Regulator;
+//extern Regulator_t Regulator;
 
 /*--------------------Functions--------------------*/
 
@@ -39,4 +39,4 @@ extern Regulator_t Regulator;
 void Regulator_Init(void);
 
 /*Set Regulator to desired state according to input temperature*/
-Regulator_State_t Regulator_Regulate(uint16_t temperature);
+Regulator_State_t Regulator_Regulate(const Regulator_t *Regulator,const uint16_t temperature);

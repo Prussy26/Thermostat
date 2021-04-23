@@ -13,7 +13,7 @@
 /*--------------------Variables--------------------*/
 /*Public*/
 
-Regulator_t Regulator = { 200 , 4 , On }; // Initializing Regulator Variables to implicit values
+//Regulator_t Regulator = { 200 , 4 , On }; // Initializing Regulator Variables to implicit values
 	
 /*Private*/
 Regulator_State_t Regulator_State = Idle;
@@ -27,9 +27,9 @@ Regulator_State_t Regulator_State = Idle;
 /*--------------------Functions--------------------*/
 /*Private*/
 
-void Regulator_Cool(void)
+void Regulator_Cool(const Regulator_t *Regulator)
 {
-	if((Regulator.Mode == On) || (Regulator.Mode == Cooling_Only))
+	if((Regulator->Mode == On) || (Regulator->Mode == Cooling_Only))
 	{
 		Regulator_COOL();
 		Regulator_State = Cooling;
@@ -42,9 +42,9 @@ void Regulator_Idle(void)
 	Regulator_State = Idle;
 }
 
-void Regulator_Heat(void)
+void Regulator_Heat(const Regulator_t *Regulator)
 {
-	if((Regulator.Mode == On) || (Regulator.Mode == Heating_Only))
+	if((Regulator->Mode == On) || (Regulator->Mode == Heating_Only))
 	{
 		Regulator_HEAT();
 		Regulator_State = Heating;
@@ -63,26 +63,26 @@ void Regulator_Init(void)
 }
 
 /*Set Regulator to desired state according to input temperature*/
-Regulator_State_t Regulator_Regulate(uint16_t temperature)
+Regulator_State_t Regulator_Regulate(const Regulator_t *Regulator, const uint16_t temperature)
 {
-	if(Regulator.Mode != Off) // Regulate only if regulation is turned on
+	if(Regulator->Mode != Off) // Regulate only if regulation is turned on
 	{
 		switch(Regulator_State)
 		{
 			case Idle:
-				if(temperature >= Regulator.Temperature + Regulator.Hysteresis)
-					Regulator_Cool();
-				else if(temperature <= Regulator.Temperature - Regulator.Hysteresis)
-					Regulator_Heat();
+				if(temperature >= Regulator->Temperature + Regulator->Hysteresis)
+					Regulator_Cool(Regulator);
+				else if(temperature <= Regulator->Temperature - Regulator->Hysteresis)
+					Regulator_Heat(Regulator);
 			break;
 			
 			case Cooling:
-				if(temperature <= Regulator.Temperature)
+				if(temperature <= Regulator->Temperature)
 					Regulator_Idle();
 			break;
 			
 			case Heating:
-				if(temperature >= Regulator.Temperature)
+				if(temperature >= Regulator->Temperature)
 					Regulator_Idle();
 			break;
 			

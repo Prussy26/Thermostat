@@ -19,7 +19,7 @@
 /*Defining de-bouncing Times*/
 #define DEBOUNC_TIME_ENCODER 5 // 5 ms
 #define DEBOUNC_TIME_BUTTON 20 // 10 ms
-#define LONG_PRESS_TIME 800 // 800 ms
+#define LONG_PRESS_TIME 600 // 800 ms
 #define TIMEOUT 10000 // 10 s
 
 /*Defining ENCSR Register Bits*/

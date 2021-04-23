@@ -18,33 +18,66 @@
 
 int main(void)
 {
-	Initialization();
+	Thermistor_t Thermistor = {
+		.R0 = 10,
+		.B = 3895,
+		.Offset = 0
+		};
 		
-	Thermostat_t *Thermostat = {0};
-	Thermostat->Time_i = 0;
-	Thermostat->Menu_i = 0;
-	Thermostat->State = Default_State;
+	Regulator_t Regulator = { 
+		.Temperature = 20,
+		.Hysteresis = 4,
+		.Mode = On
+		};
+		
+	uint8_t *Time = { 0 };
+		
+	ThermostatParameters_t Parameters = {
+		.Thermistor = &Thermistor,
+		.Regulator = &Regulator,
+		.Brightness = 100
+	};
+	
+	Thermostat_t Thermostat = { 
+		.Temperature = 20,
+		.Menu_i = 0,
+		.Time_i = 0,
+		.State = Default_State,
+		.Time = Time,
+		.Parameters =  &Parameters
+		};
+				
+	Thermostat_t *Thermostat_p = &Thermostat;
+	//Thermostat_p->Parameters->Thermistor = &Thermistor;
+	//Thermostat_p->Parameters->Regulator = &Regulator;
+	//Thermostat_p->Time = Time;
+	//Thermostat_p->Time_i = 0;
+	//Thermostat_p->Menu_i = 0;
+	//Thermostat_p->State = Default_State;
+	//Thermostat_p->Parameters->Regulator->Temperature = 20;
+	
+	Initialization(Thermostat_p);
 		
     while (1) 
     {	
-		Periodic_Tasks_Run(Thermostat);		
-		Control(Thermostat);
+		Periodic_Tasks_Run(Thermostat_p);		
+		Control(Thermostat_p);
     }
 }
 
 
-void Initialization(void)
+void Initialization(Thermostat_t *Thermostat)
 {
 	Thermistor_Init(AVCC);
 	Regulator_Init();
-	Regulator.Temperature = 220;
+	Thermostat->Parameters->Regulator->Temperature = 220;
 	RTC_Init();
 	Encoder_Init();
 	LCD_Init();	
 	
 	RTC_SetSQ(RTC_SQ_1Hz);
 	
-	Draw_Frame();	
+	Draw_Frame(Thermostat);	
 }
 
 
@@ -75,10 +108,10 @@ void Periodic_Tasks_Run(Thermostat_t *Thermostat)
 		// Every Second Task
 		if(GET_BIT(PTR,PTRSEC) != 0)	
 		{	
-			Thermostat->Temperature  = Thermistor_GetTemperatureX10(ADCP1);			
-			Regulator_Regulate(Thermostat->Temperature);
-						
+			Thermostat->Temperature  = Thermistor_GetTemperatureX10(ADCP1);
+			Regulator_Regulate(Thermostat->Parameters->Regulator, Thermostat->Temperature);			
 			Draw_Temp(Thermostat->Temperature);
+			
 			Thermostat->Time = RTC_GetTimeAndDate24();
 			
 			Periodic_Tasks_Set(Thermostat->Time);
@@ -247,19 +280,19 @@ void Control(Thermostat_t *Thermostat)
 				break;
 			
 				case Shift_Left:
-				if (Regulator.Temperature > 100) // Min. 10.0 °C
+				if (Thermostat->Parameters->Regulator->Temperature > 100) // Min. 10.0 °C
 				{
-					Regulator.Temperature--;
-					Draw_STemp(Regulator.Temperature);
+					Thermostat->Parameters->Regulator->Temperature--;
+					Draw_STemp(Thermostat->Parameters->Regulator->Temperature);
 					LCD_SetPosition(DRAW_STEMP + 3);
 				}
 				break;
 			
 				case Shift_Right:
-				if (Regulator.Temperature < 300) // Max. 30.0 °C
+				if (Thermostat->Parameters->Regulator->Temperature < 300) // Max. 30.0 °C
 				{
-					Regulator.Temperature++;
-					Draw_STemp(Regulator.Temperature);
+					Thermostat->Parameters->Regulator->Temperature++;
+					Draw_STemp(Thermostat->Parameters->Regulator->Temperature);
 					LCD_SetPosition(DRAW_STEMP + 3);
 				}
 				break;

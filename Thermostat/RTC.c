@@ -16,7 +16,7 @@
 #include "I2C.h"
 #include "RTC.h"
 
-uint8_t Time_Max[RTC_SIZE_FULL_TIME] = { 59 , 59 , 23 , 6 , 31 , 12 , 99 };
+uint8_t Time_Max[RTC_SIZE_TIME_ARRAY] = { 59 , 59 , 23 , 6 , 31 , 12 , 99 , 1 , 1 };
 
 /*--------------------Functions--------------------*/
 /*Public*/
@@ -48,15 +48,17 @@ void RTC_Init()
 
 void RTC_CheckTime(uint8_t *TimeData)
 {
-	for(uint8_t address = RTC_ADDRESS_SECOND ; address <= RTC_ADDRESS_YEAR ; address++)
+	for(uint8_t i = Sec ; i < RTC_SIZE_TIME_ARRAY ; i++)
 	{
-		//TimeBCD[address + 1] = DECtoBCD(TimeData[address]);
+		if(TimeData[i] > Time_Max[i]) TimeData[i] = 0;
 	}
 }
 
 /*Set Time and Date*/
-void RTC_SetTime(const uint8_t *TimeData)
+void RTC_SetTime(uint8_t *TimeData)
 {
+	RTC_CheckTime(TimeData);
+	
 	uint8_t TimeBCD[RTC_SIZE_FULL_TIME + 1] = {0};
 	TimeBCD[0] = RTC_ADDRESS_SECOND;
 		
@@ -116,6 +118,8 @@ uint8_t *RTC_GetTimeAndDate(void)
 	
 	TimeData[Day] --;
 	
+	RTC_CheckTime(TimeData);
+	
 	return TimeData;
 }
 
@@ -137,6 +141,8 @@ uint8_t *RTC_GetTimeAndDate24(void)
 	}
 	
 	TimeData[Day] --;
+	
+	RTC_CheckTime(TimeData);
 	
 	return TimeData;
 }

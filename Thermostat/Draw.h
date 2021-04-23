@@ -15,9 +15,9 @@
 #define DRAW_STEMP	LCD_PAGE0 + LCD_ROW2_START
 #define DRAW_MIN	LCD_PAGE0 + LCD_ROW1_START + 12
 #define DRAW_HOUR	LCD_PAGE0 + LCD_ROW1_START + 9
-#define DRAW_DAY	LCD_PAGE0 + LCD_ROW2_START + 14
-#define DRAW_DATE	LCD_PAGE0 + LCD_ROW2_START + 8
-#define DRAW_MONTH	LCD_PAGE0 + LCD_ROW2_START + 11
+#define DRAW_DAY	LCD_PAGE0 + LCD_ROW2_START + 8
+#define DRAW_DATE	LCD_PAGE0 + LCD_ROW2_START + 11
+#define DRAW_MONTH	LCD_PAGE0 + LCD_ROW2_START + 14
 
 #define DRAW_ICON	LCD_PAGE0 + LCD_ROW1_END
 
@@ -34,7 +34,7 @@ enum Menu_i { Time_Set = 0 , Temperature_Set , Programs_Set , Hysteresis_Set , B
 /*--------------------Functions--------------------*/
 
 /*Draw Front Frame of the LCD Display*/
-void Draw_Frame(void);
+void Draw_Frame(const Thermostat_t *Thermostat);
 
 /*Draw Temperature*/
 void Draw_Temp(const uint16_t temperature);

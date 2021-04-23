@@ -12,6 +12,7 @@
 
 #include "Thermistor.h"
 #include "Regulator.h"
+#include "RTC.h"
 
 /*--------------------Registers--------------------*/
 
@@ -57,7 +58,7 @@ enum State_t { Default_State , TempSet_State , Menu_State , TimeSet_State , Ther
 
 /*--------------------Functions--------------------*/
 
-void Initialization(void);
+void Initialization(Thermostat_t *Thermostat);
 
 void Control(Thermostat_t *Thermostat);
 void Periodic_Tasks_Set(uint8_t* Time);

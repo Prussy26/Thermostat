@@ -87,11 +87,11 @@ enum { Monday = 0, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday };
 
 /*--------------------Variables--------------------*/
 
-//typedef uint8_t Time_t[RTC_SIZE_TIME_ARRAY];
+typedef uint8_t Time_t[RTC_SIZE_TIME_ARRAY];
 
 typedef uint8_t error_code;
 
-extern uint8_t Time_Max[RTC_SIZE_FULL_TIME];
+extern uint8_t Time_Max[RTC_SIZE_TIME_ARRAY];
 
 /*--------------------Functions--------------------*/
 
@@ -102,8 +102,11 @@ uint8_t BCDtoDEC(uint8_t bcd);
 /*Initializing RTC*/
 void RTC_Init();
 
+/*Check and trim all Time Values*/
+void RTC_CheckTime(uint8_t *TimeData);
+
 /*Set Time and Date*/
-void RTC_SetTime(const uint8_t *TimeData);
+void RTC_SetTime(uint8_t *TimeData);
 
 /*Get Time and Date*/
 uint8_t *RTC_GetTimeAndDate(void);
