@@ -19,23 +19,14 @@
 int main(void)
 {
 	Initialization();
-	
-	//LCD_Draw_Char(0x7E);
-	//LCD_SetPosition(0,1);
-	//fprintf(&LCD_Stream, "Hysteresis 0.2");
-	//LCD_SetPosition(1,1);
-	//fprintf(&LCD_Stream, "Brightness 100%%");
-	
+		
 	Thermostat_t *Thermostat = {0};
+	Thermostat->Time_i = 0;
 	Thermostat->Menu_i = 0;
 	Thermostat->State = Default_State;
 		
     while (1) 
     {	
-		
-		
-			
-		
 		Periodic_Tasks_Run(Thermostat);		
 		Control(Thermostat);
     }
@@ -53,34 +44,25 @@ void Initialization(void)
 	
 	RTC_SetSQ(RTC_SQ_1Hz);
 	
-	Draw_Frame();
-	
+	Draw_Frame();	
 }
 
 
 void Periodic_Tasks_Set(uint8_t *Time)
 {
-	Time[Day]--;
 	for(uint8_t i = 0 ; i <= RTC_SIZE_FULL_TIME ; i++)
 	{
 		if(Time[i] == 0)
 			PTR |= (1<<(i+2));
 		else if(i != Day) break;
 	}
-	Time[Day]++;
 }
 
 void Periodic_Tasks_Run(Thermostat_t *Thermostat)
 {
 	// Every Second Task that cannot be disabled
 	if(GET_BIT(PTR,PTRSEC) != 0)	
-	{
-		Thermostat->Time = RTC_GetTimeAndDate24();
-		Thermostat->Temperature  = Thermistor_GetTemperatureX10(ADCP1);			
-		Regulator_Regulate(Thermostat->Temperature);
-		
-		Periodic_Tasks_Set(Thermostat->Time);
-		
+	{	
 		Encoder_millisCheck(); // Overflow protection of millis
 		
 		if(GET_BIT(PTR,PTREN) == 0) 	
@@ -92,8 +74,14 @@ void Periodic_Tasks_Run(Thermostat_t *Thermostat)
 	{
 		// Every Second Task
 		if(GET_BIT(PTR,PTRSEC) != 0)	
-		{
+		{	
+			Thermostat->Temperature  = Thermistor_GetTemperatureX10(ADCP1);			
+			Regulator_Regulate(Thermostat->Temperature);
+						
 			Draw_Temp(Thermostat->Temperature);
+			Thermostat->Time = RTC_GetTimeAndDate24();
+			
+			Periodic_Tasks_Set(Thermostat->Time);
 			
 			CLR_BIT(PTR,PTRSEC); // Task Done
 		}
@@ -113,6 +101,7 @@ void Periodic_Tasks_Run(Thermostat_t *Thermostat)
 		// Every Day Task
 		if(GET_BIT(PTR,PTRDAY) != 0)	
 		{
+			Draw_Day(Thermostat->Time);
 			Draw_Date(Thermostat->Time);
 			CLR_BIT(PTR,PTRDAY); // Task Done
 		}
@@ -131,7 +120,7 @@ void Periodic_Tasks_Run(Thermostat_t *Thermostat)
 		// Every Year Task
 		if(GET_BIT(PTR,PTRYEAR) != 0) 
 		{
-			Draw_Year(Thermostat->Time);
+			//Draw_Year(Thermostat->Time);
 			CLR_BIT(PTR,PTRYEAR); // Task Done
 		}
 		
@@ -143,12 +132,14 @@ void To_DefaultState(Thermostat_t *Thermostat)
 	LCD_GoTo(LCD_PAGE0);
 	LCD_CursorOFF();
 	SET_BIT(PTR,PTREN);
+	RTC_SetSQ(RTC_SQ_1Hz);
 
 	Thermostat->State = Default_State;
 }
 
 void To_TempSetState(Thermostat_t *Thermostat)
 {
+	LCD_GoTo(LCD_PAGE0);
 	LCD_SetPosition(DRAW_STEMP + 3);
 	LCD_CursorON();
 	CLR_BIT(PTR,PTREN);
@@ -156,21 +147,71 @@ void To_TempSetState(Thermostat_t *Thermostat)
 	Thermostat->State = TempSet_State;
 }
 
-void To_TimeSetState(Thermostat_t *Thermostat)
-{
-	Thermostat->Time_i = 0;
-	LCD_SetPosition(Time_Position[Thermostat->Time_i]);
-	LCD_CursorON();
-	CLR_BIT(PTR,PTREN);
-	
-	Thermostat->State = TimeSet_State;
-}
 
 void To_MenuState(Thermostat_t *Thermostat)
 {
 	LCD_GoTo(LCD_PAGE1);
 	
 	Thermostat->State = Menu_State;
+}
+
+void To_Menui(Thermostat_t *Thermostat)
+{
+	switch (Thermostat->Menu_i)
+	{	
+		case Time_Set:
+			To_TimeSetState(Thermostat);
+		break;
+		
+		case Temperature_Set:
+			To_ThermistorOffSetState(Thermostat);
+		break;
+		
+		case Programs_Set:
+			//To_ProgramState();
+		break;
+		
+		case Hysteresis_Set:
+			//To_HysteresisSetState();
+		break;
+		
+		case Brightness_Set:
+			//To_BrightnessSetState();
+		break;
+	}
+}
+
+void To_TimeSetState(Thermostat_t *Thermostat)
+{
+	LCD_GoTo(LCD_PAGE0);
+	Thermostat->Time[Sec] = 0;
+	Thermostat->Time_i = 0;
+	LCD_SetPosition(DRAW_MIN + 1);
+	LCD_CursorON();
+	CLR_BIT(PTR,PTREN);
+	
+	Thermostat->State = TimeSet_State;
+}
+
+void To_ThermistorOffSetState(Thermostat_t *Thermostat)
+{
+	LCD_GoTo(LCD_PAGE0);
+	LCD_SetPosition(DRAW_TEMP + 3);
+	LCD_CursorON();
+	
+	CLR_BIT(PTR,PTREN);
+	
+	Thermostat->State = ThermistorOffSet_State;
+}
+
+void To_ProgramState(Thermostat_t *Thermostat)
+{
+	//LCD_SetPosition(DRAW_TEMP + 3);
+	LCD_CursorON();
+	
+	CLR_BIT(PTR,PTREN);
+	
+	Thermostat->State = Default_State;
 }
 
 void Control(Thermostat_t *Thermostat)
@@ -235,10 +276,11 @@ void Control(Thermostat_t *Thermostat)
 			{
 				case Short_Press:
 									
-					//Thermostat->State = Thermostat->Menu_i + Menu_State + 1;
+					To_Menui(Thermostat);
 				break;
 				
 				case Long_Press:
+				
 					To_DefaultState(Thermostat);
 				break;
 				
@@ -263,13 +305,58 @@ void Control(Thermostat_t *Thermostat)
 				break;
 			}
 		break;
+		
+		case TimeSet_State:
+			switch(Encoder_Get())
+			{
+				case Short_Press:
+					if (Thermostat->Time_i < (Month - Min))
+					{
+						Thermostat->Time_i++;
+						LCD_SetPosition(Time_Position[Thermostat->Time_i] + 1);			
+					}
+					else 
+					{
+						RTC_SetTime(Thermostat->Time);
+						PTR = 0xFF;
+						To_DefaultState(Thermostat);
+					}
+				break;
+			
+				case Long_Press:
+					RTC_SetTime(Thermostat->Time);
+					PTR = 0xFF;
+					To_DefaultState(Thermostat);
+				break;
+			
+				case Shift_Left:
+					if (Thermostat->Time[Thermostat->Time_i + Min] > 0) // Min-Month
+					{
+						Thermostat->Time[Thermostat->Time_i + Min]--;
+						Draw_Time(Thermostat);
+					}
+				break;
+			
+				case Shift_Right:
+					if (Thermostat->Time[Thermostat->Time_i + Min] < Time_Max[Thermostat->Time_i + Min]) // Min-Month
+					{
+						Thermostat->Time[Thermostat->Time_i + Min]++;
+						Draw_Time(Thermostat);
+					}
+				break;
+			
+				case Timeout:
+				To_DefaultState(Thermostat);
+				break;
+			}
+		break;
 
 		
 		default:
-		LCD_SetPosition(DRAW_ICON);
-		fprintf(&LCD_Stream, "!");
-		
-		Thermostat->State = Default_State;
+			LCD_SetPosition(DRAW_ICON);
+			fprintf(&LCD_Stream, "!");
+			
+			To_DefaultState(Thermostat);
 		break;
 	}
 	//switch(Encoder_Get())

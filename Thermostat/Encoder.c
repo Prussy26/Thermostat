@@ -18,7 +18,7 @@
 
 /*Defining de-bouncing Times*/
 #define DEBOUNC_TIME_ENCODER 5 // 5 ms
-#define DEBOUNC_TIME_BUTTON 10 // 10 ms
+#define DEBOUNC_TIME_BUTTON 20 // 10 ms
 #define LONG_PRESS_TIME 800 // 800 ms
 #define TIMEOUT 10000 // 10 s
 
@@ -42,7 +42,7 @@ typedef struct Encoder_t
 	uint32_t PrevButtonTime;	// Previous Button Click Time
 } Encoder_t;
 
-Encoder_t Encoder = { 0 , 0 , 0};
+Encoder_t Encoder = { .ENCSR = (1<<ENCEN) | (1<<ENCSEN) , 0 , 0};
 
 // Private Functions --------------------------------------------------
 
@@ -108,24 +108,25 @@ uint8_t Encoder_Get(void)
 	if(GET_BIT(Encoder.ENCSR,ENCSP) != 0)
 	{
 		CLR_BIT(Encoder.ENCSR,ENCSP);
+		//CLR_BIT(Encoder.ENCSR,ENCPEN);
 		return Short_Press;
 	}
-	else if(millis() >= (Encoder.PrevButtonTime + LONG_PRESS_TIME) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
+	if(millis() >= (Encoder.PrevButtonTime + LONG_PRESS_TIME) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
 	{
 		CLR_BIT(Encoder.ENCSR,ENCPEN);
 		return Long_Press;
 	}	
-
 	if(GET_BIT(Encoder.ENCSR,ENCRS) != 0)
 	{
 		CLR_BIT(Encoder.ENCSR,ENCRS);
 		return Shift_Right;
 	}
-	else if(GET_BIT(Encoder.ENCSR,ENCLS) != 0)
+	if(GET_BIT(Encoder.ENCSR,ENCLS) != 0)
 	{
 		CLR_BIT(Encoder.ENCSR,ENCLS);
 		return Shift_Left;
 	}
+	
 	/*Timeout Control*/
 	if(Encoder.PrevButtonTime > Encoder.PrevEncoderTime)
 	{
@@ -178,7 +179,7 @@ ISR(PCINT1_vect)
 		{
 			SET_BIT(Encoder.ENCSR,ENCPEN);			// Enable Press Functionality
 		}
-		else if((GET_BIT(Encoder.ENCSR,ENCPBS) != 0)) // Button is Released
+		else// if((GET_BIT(Encoder.ENCSR,ENCPBS) != 0)) // Button is Released
 		{
 			/*If Released before Long Press then its Short Press*/
 			if((millis() <= (Encoder.PrevButtonTime + LONG_PRESS_TIME)) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
@@ -187,7 +188,7 @@ ISR(PCINT1_vect)
 				CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
 			}
 		}
-		Encoder.PrevButtonTime = millis();	
 		ReadButton(); 
+		Encoder.PrevButtonTime = millis();		
 	}	
 }

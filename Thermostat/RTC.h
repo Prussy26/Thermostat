@@ -69,20 +69,20 @@
 
 enum 
 {
-	Sec,    // 0 to 59
-	Min,    // 0 to 59
-	Hour,   // 0 to 23
-	Day,	// 1-7
-	Date,	// 1 to 31
-	Month,  // 1 to 12
-	Year,   // (20)00-(20)99
+	Sec = 0,    // 0 to 59
+	Min = 1,    // 0 to 59
+	Hour = 2,   // 0 to 23
+	Day = 3,	// 1-7
+	Date = 4,	// 1 to 31
+	Month = 5,  // 1 to 12
+	Year = 6,   // (20)00-(20)99
 	
 	/* 12/24-hour clock data*/
 	_12_24, // true for 12, false for 24 (hour clock time)
 	PM_AM	// true for PM, false for AM	
 };
 
-enum { Monday = 1, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday };
+enum { Monday = 0, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday };
 
 
 /*--------------------Variables--------------------*/
@@ -91,6 +91,7 @@ enum { Monday = 1, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday };
 
 typedef uint8_t error_code;
 
+extern uint8_t Time_Max[RTC_SIZE_FULL_TIME];
 
 /*--------------------Functions--------------------*/
 

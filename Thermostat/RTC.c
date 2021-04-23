@@ -16,6 +16,7 @@
 #include "I2C.h"
 #include "RTC.h"
 
+uint8_t Time_Max[RTC_SIZE_FULL_TIME] = { 59 , 59 , 23 , 6 , 31 , 12 , 99 };
 
 /*--------------------Functions--------------------*/
 /*Public*/
@@ -45,6 +46,14 @@ void RTC_Init()
 	I2C_Init(I2C_FREQ_100K);
 }
 
+void RTC_CheckTime(uint8_t *TimeData)
+{
+	for(uint8_t address = RTC_ADDRESS_SECOND ; address <= RTC_ADDRESS_YEAR ; address++)
+	{
+		//TimeBCD[address + 1] = DECtoBCD(TimeData[address]);
+	}
+}
+
 /*Set Time and Date*/
 void RTC_SetTime(const uint8_t *TimeData)
 {
@@ -56,14 +65,16 @@ void RTC_SetTime(const uint8_t *TimeData)
 		TimeBCD[address + 1] = DECtoBCD(TimeData[address]);
 	}
 	
-	if(TimeData[_12_24] == RTC_12) 
+	if(TimeData[_12_24] == RTC_12)
 	{
 		TimeBCD[Hour + 1] |= (1<<RTC_12_24);
-		if(TimeData[PM_AM] == RTC_PM) 
+		if(TimeData[PM_AM] == RTC_PM)
 		{
 			TimeBCD[Hour + 1] |= (1<<RTC_PM_AM);
-		}	
+		}
 	}
+	
+	TimeBCD[Day + 1] = DECtoBCD(TimeData[Day] + 1);
 	
 	I2C_TransmitData(RTC_ADDRESS, TimeBCD, RTC_SIZE_FULL_TIME + 1, I2C_NOREPEATSTART);
 }
@@ -103,6 +114,8 @@ uint8_t *RTC_GetTimeAndDate(void)
 		TimeData[address] = BCDtoDEC(TimeData[address]);		
 	}
 	
+	TimeData[Day] --;
+	
 	return TimeData;
 }
 
@@ -122,6 +135,8 @@ uint8_t *RTC_GetTimeAndDate24(void)
 	{
 		TimeData[address] = BCDtoDEC(TimeData[address]);
 	}
+	
+	TimeData[Day] --;
 	
 	return TimeData;
 }

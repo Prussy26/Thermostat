@@ -32,10 +32,10 @@ extern uint8_t PTR; // Periodic Tasks Register : Every Minute, Hourly, Daily, We
 
 typedef struct ThermostatParameters_t
 {
-	Thermistor_t Thermistor;	// Thermistor parameters
-	Regulator_t Regulator;		// Regulator parameters
+	Thermistor_t *Thermistor;	// Thermistor parameters
+	Regulator_t *Regulator;		// Regulator parameters
 	//Program_t Program;		// Daily programs
-	uint8_t Brightness;		// Brightness of LCD
+	uint8_t Brightness;			// Brightness of LCD
 } ThermostatParameters_t;
 
 typedef struct Thermostat_t
@@ -48,7 +48,7 @@ typedef struct Thermostat_t
 	ThermostatParameters_t *Parameters; 
 } Thermostat_t;
 
-enum State { Default_State , TempSet_State , Menu_State , TimeSet_State , ThermistorOffSet_State , ProgramsSet_State , Hysteresis_State, Brightness_State ,  Error_State};
+enum State_t { Default_State , TempSet_State , Menu_State , TimeSet_State , ThermistorOffSet_State , ProgramsSet_State , Hysteresis_State, Brightness_State ,  Error_State};
 	
 	
 
@@ -62,4 +62,26 @@ void Initialization(void);
 void Control(Thermostat_t *Thermostat);
 void Periodic_Tasks_Set(uint8_t* Time);
 void Periodic_Tasks_Run(Thermostat_t *Thermostat);
+
+void To_DefaultState(Thermostat_t *Thermostat);
+
+
+void To_TempSetState(Thermostat_t *Thermostat);
+
+void To_MenuState(Thermostat_t *Thermostat);
+
+
+void To_Menui(Thermostat_t *Thermostat);
+
+
+void To_TimeSetState(Thermostat_t *Thermostat);
+
+
+void To_ThermistorOffSetState(Thermostat_t *Thermostat);
+
+
+void To_ProgramState(Thermostat_t *Thermostat);
+
+
+void Control(Thermostat_t *Thermostat);
 
