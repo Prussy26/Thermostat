@@ -7,6 +7,10 @@
 
 #include <avr/io.h>
 #include <stdio.h>
+#include <avr/cpufunc.h>
+#include <avr/interrupt.h>
+
+#include "Bit.h"
 
 #include "timer.h"
 #include "ADC.h"
@@ -66,16 +70,20 @@ void LCD_SendData(const uint8_t data)
 /*Initializing LCD Display*/
 void LCD_Init(void)
 {	
-	timerInit();
+	//timerInit();
 	ADC_Init(AVCC);
 	/*Setting Data Direction Registers*/
 	LCD_DDR_RS |= (1<<LCD_RS); 
 	LCD_DDR_E  |= (1<<LCD_E);
+	DDR(LCD_PORT_BRIGHTNESS) |= (1<<LCD_BRIGHTNESS);
 	LCD_DDR_D  |= (1<<LCD_D7) | (1<<LCD_D6) | (1<<LCD_D5) | (1<<LCD_D4);
 	
 	/*Clearing Ports*/
 	LCD_PORT_RS &= ~(1<<LCD_RS);
 	LCD_PORT_E  &= ~(1<<LCD_E);
+	
+	/*Setting Brightness ON*/
+	LCD_PORT_BRIGHTNESS  |= (1<<LCD_BRIGHTNESS);
 	
 	delay_us(10000); // 10 ms
 	
@@ -84,6 +92,9 @@ void LCD_Init(void)
 	LCD_SendInstruction(LCD_DISPLAY_ON);
 	LCD_SendInstruction(LCD_CLEAR_DISP);
 	LCD_EntryModeSet(1, 0);	// Incrementing cursor
+	
+	
+	LCD_BrightnessInit(50);
 } 
 
 /*Software Reset of LCD Display*/
@@ -159,6 +170,31 @@ void LCD_CursorOFF()
 	LCD_SendInstruction(LCD_DISPLAY_ON);
 }
 
+
+/*Initializing PWM and sets Brightness Level*/
+void LCD_BrightnessInit(uint8_t brightness)
+{
+	if(brightness <= 100)
+	{
+		TCCR1A = (1<<COM1B1) | (1<<WGM10);		
+		//TIMSK1 = (1<<TOIE1);		
+		TCCR1B = (1<<WGM12);
+				
+		OCR1B = ((uint16_t)brightness*255)/100;
+		
+		TCCR1B |= (1<<CS10);
+		//sei();
+	}
+}
+
+
+void LCD_SetBrightness(uint8_t brightness)
+{
+	if(brightness <= 100)
+	{						
+		OCR1B = ((uint32_t)brightness*255)/100;		
+	}
+}
 
 
 

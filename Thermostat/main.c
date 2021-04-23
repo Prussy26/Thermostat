@@ -30,7 +30,7 @@ int main(void)
 		.Mode = On
 		};
 		
-	uint8_t *Time = { 0 };
+	uint8_t Time[RTC_SIZE_FULL_TIME] = { 0 };
 		
 	ThermostatParameters_t Parameters = {
 		.Thermistor = &Thermistor,
@@ -115,6 +115,7 @@ void Periodic_Tasks_Run(Thermostat_t *Thermostat)
 			Thermostat->Time = RTC_GetTimeAndDate24();
 			
 			Periodic_Tasks_Set(Thermostat->Time);
+			//LCD_BrightnessInit(100);
 			
 			CLR_BIT(PTR,PTRSEC); // Task Done
 		}
@@ -184,6 +185,7 @@ void To_TempSetState(Thermostat_t *Thermostat)
 void To_MenuState(Thermostat_t *Thermostat)
 {
 	LCD_GoTo(LCD_PAGE1);
+	LCD_CursorOFF();
 	
 	Thermostat->State = Menu_State;
 }
@@ -209,7 +211,7 @@ void To_Menui(Thermostat_t *Thermostat)
 		break;
 		
 		case Brightness_Set:
-			//To_BrightnessSetState();
+			To_BrightnessSetState(Thermostat);
 		break;
 	}
 }
@@ -245,6 +247,16 @@ void To_ProgramState(Thermostat_t *Thermostat)
 	CLR_BIT(PTR,PTREN);
 	
 	Thermostat->State = Default_State;
+}
+
+void To_BrightnessSetState(Thermostat_t *Thermostat)
+{
+	LCD_SetPosition(DRAW_BRIGHTNESS + 2);
+	LCD_CursorON();
+	
+	CLR_BIT(PTR,PTREN);
+	
+	Thermostat->State = Brightness_State;
 }
 
 void Control(Thermostat_t *Thermostat)
@@ -334,7 +346,7 @@ void Control(Thermostat_t *Thermostat)
 				break;
 				
 				case Timeout:
-				To_DefaultState(Thermostat);
+					To_DefaultState(Thermostat);
 				break;
 			}
 		break;
@@ -380,6 +392,42 @@ void Control(Thermostat_t *Thermostat)
 			
 				case Timeout:
 				To_DefaultState(Thermostat);
+				break;
+			}
+		break;
+		
+		case Brightness_State:
+			switch(Encoder_Get())
+			{
+				case Short_Press:
+					To_MenuState(Thermostat);
+				break;
+			
+				case Long_Press:
+				
+					To_DefaultState(Thermostat);
+				break;
+			
+				case Shift_Left:
+					if (Thermostat->Parameters->Brightness >= 10) 
+					{
+						Thermostat->Parameters->Brightness -= 10;
+						LCD_SetBrightness(Thermostat->Parameters->Brightness);
+						Draw_Brightness(Thermostat->Parameters->Brightness);
+					}
+				break;
+			
+				case Shift_Right:
+					if (Thermostat->Parameters->Brightness <= 90) // Max 100%
+					{
+						Thermostat->Parameters->Brightness += 10;
+						LCD_SetBrightness(Thermostat->Parameters->Brightness);
+						Draw_Brightness(Thermostat->Parameters->Brightness);
+					}
+				break;
+			
+				case Timeout:
+					To_DefaultState(Thermostat);
 				break;
 			}
 		break;

@@ -27,6 +27,10 @@
 #define LCD_PORT_E	PORTB		// Port B Data Register
 #define LCD_E		PORTB1		// Bit of PORTB Register (PB1)
 
+/*Defining Brightness Port*/
+ #define LCD_PORT_BRIGHTNESS PORTB		// Port B Data Register
+ #define LCD_BRIGHTNESS		 PORTB2		// The Port B Input Pins (PB2) 
+
 /*Defining Data Port*/
  #define LCD_DDR_D	DDRD		// Data Direction Register D
  #define LCD_PORT_D PORTD		// Port D Data Register
@@ -136,6 +140,13 @@ void LCD_CursorON();
 
 /*Cursor Full OFF*/
 void LCD_CursorOFF();
+
+/*Initializing PWM and sets Brightness Level*/
+void LCD_BrightnessInit(uint8_t brightness);
+
+/*Sets Brightness Level*/
+void LCD_SetBrightness(uint8_t brightness);
+
 
 
 

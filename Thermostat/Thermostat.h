@@ -83,6 +83,7 @@ void To_ThermistorOffSetState(Thermostat_t *Thermostat);
 
 void To_ProgramState(Thermostat_t *Thermostat);
 
+void To_BrightnessSetState(Thermostat_t *Thermostat);
 
 void Control(Thermostat_t *Thermostat);
 

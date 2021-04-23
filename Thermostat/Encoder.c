@@ -173,8 +173,10 @@ ISR(INT0_vect)
 
 ISR(PCINT1_vect)
 {
+	
 	if(millis() >= (Encoder.PrevButtonTime + DEBOUNC_TIME_BUTTON))
-	{		 	
+	{	
+		cli();	 	
 		if((GET_BIT(Encoder.ENCSR,ENCPBS) == 0)) // Button is Pushed
 		{
 			SET_BIT(Encoder.ENCSR,ENCPEN);			// Enable Press Functionality
@@ -187,8 +189,10 @@ ISR(PCINT1_vect)
 				SET_BIT(Encoder.ENCSR,ENCSP);  // Set Short Press Flag
 				CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
 			}
+			
 		}
 		ReadButton(); 
-		Encoder.PrevButtonTime = millis();		
+		Encoder.PrevButtonTime = millis();	
+		sei();	
 	}	
 }

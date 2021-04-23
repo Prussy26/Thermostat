@@ -48,7 +48,7 @@ void RTC_Init()
 
 void RTC_CheckTime(uint8_t *TimeData)
 {
-	for(uint8_t i = Sec ; i < RTC_SIZE_TIME_ARRAY ; i++)
+	for(uint8_t i = Sec ; i < RTC_SIZE_FULL_TIME ; i++)
 	{
 		if(TimeData[i] > Time_Max[i]) TimeData[i] = 0;
 	}

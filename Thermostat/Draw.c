@@ -244,4 +244,9 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 	}
 }
 
-
+/*Draw Brightness Value*/
+void Draw_Brightness(const uint8_t Brightness)
+{
+	LCD_SetPosition(DRAW_BRIGHTNESS);
+	fprintf(&LCD_Stream, "%3u", Brightness);
+}

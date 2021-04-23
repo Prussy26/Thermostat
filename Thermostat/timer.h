@@ -17,8 +17,8 @@ uint32_t millis(void);
 
 // Timer1 ----------------------------------------------------------
 
-void timerInit(void);	// Initializing timer
-uint32_t getTime(void); // Returns time in us
+//void timerInit(void);	// Initializing timer
+//uint32_t getTime(void); // Returns time in us
 
 //void busyDelay_us(uint32_t us); // Busy wait
 void delay_us(uint32_t us); // Different busy wait :D
