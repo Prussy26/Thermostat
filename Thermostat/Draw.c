@@ -21,6 +21,7 @@ uint8_t Time_Position[5] = { DRAW_MIN, DRAW_HOUR, DRAW_DAY, DRAW_DATE, DRAW_MONT
 //uint8_t Time_Position[5] { DRAW_MIN, DRAW_HOUR, DRAW_DATE, DRAW_MONTH, DRAW_YEAR};
 
 
+
 char Day_Text[7][3] = {
 	"Mo\0",
 	"Tu\0",
@@ -51,8 +52,8 @@ void Draw_Frame(const Thermostat_t *Thermostat)
 	fprintf(&LCD_Stream, "°C");
 	
 	LCD_SetPosition(DRAW_STEMP);
-	fprintf(&LCD_Stream, "%02u.", Thermostat->Parameters->Regulator->Temperature / 10);
-	fprintf(&LCD_Stream, "%1u°C", Thermostat->Parameters->Regulator->Temperature - (Thermostat->Parameters->Regulator->Temperature / 10) * 10);
+	fprintf(&LCD_Stream, "%02u.", Thermostat->Parameters->Regulator.Temperature / 10);
+	fprintf(&LCD_Stream, "%1u°C", Thermostat->Parameters->Regulator.Temperature - (Thermostat->Parameters->Regulator.Temperature / 10) * 10);
 	
 	LCD_SetPosition(DRAW_HOUR);
 	fprintf(&LCD_Stream, "00:00");
@@ -131,6 +132,31 @@ void Draw_Month(const uint8_t *Time)
 	//fprintf(&LCD_Stream, "%02u", Time[Year]);
 //}
 
+
+void Draw_Icon(uint8_t icon)
+{
+	LCD_SetPosition(DRAW_ICON);
+	switch(icon)
+	{
+		case No_Icon:
+		LCD_DrawChar(' ');
+		break;
+		
+		case Cooling_Icon:
+		LCD_DrawChar('C');
+		break;
+		
+		case Heating_Icon:
+		LCD_DrawChar('H');
+		break;
+		
+		case Error_Icon:
+		LCD_DrawChar('!');
+		break;
+	}
+}
+
+
 /*Draw Time according to Time_i*/
 void Draw_Time(const Thermostat_t *Thermostat)
 {
@@ -203,8 +229,8 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 	{
 		case Hysteresis_Set:
 			fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i]);
-			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Regulator->Hysteresis / 10);
-			fprintf(&LCD_Stream, "%1u",  Thermostat->Parameters->Regulator->Hysteresis - ( Thermostat->Parameters->Regulator->Hysteresis/10) * 10);
+			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Regulator.Hysteresis / 10);
+			fprintf(&LCD_Stream, "%1u",  Thermostat->Parameters->Regulator.Hysteresis - ( Thermostat->Parameters->Regulator.Hysteresis/10) * 10);
 		break;
 		
 		case Brightness_Set:
@@ -225,8 +251,8 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 	{
 		case Hysteresis_Set:
 			fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i + 1]);
-			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Regulator->Hysteresis / 10);
-			fprintf(&LCD_Stream, "%1u", Thermostat->Parameters->Regulator->Hysteresis - (Thermostat->Parameters->Regulator->Hysteresis/10) * 10);
+			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Regulator.Hysteresis / 10);
+			fprintf(&LCD_Stream, "%1u", Thermostat->Parameters->Regulator.Hysteresis - (Thermostat->Parameters->Regulator.Hysteresis/10) * 10);
 		break;
 		
 		case Brightness_Set:

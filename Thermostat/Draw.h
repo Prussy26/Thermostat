@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Thermostat.h"
+#include "LCD.h"
 
 /*--------------------Constants--------------------*/
 
@@ -32,6 +33,7 @@ extern uint8_t Time_Position[5];
 
 enum Menu_i { Time_Set = 0 , Temperature_Set , Programs_Set , Hysteresis_Set , Brightness_Set , Menu_Size};
 
+enum Icon { No_Icon, Cooling_Icon, Heating_Icon , Error_Icon};
 	
 /*--------------------Functions--------------------*/
 
@@ -61,6 +63,10 @@ void Draw_Month(const uint8_t *Time);
 
 /*Draw Year*/
 //void Draw_Year(uint8_t *Time);
+
+/*Draw Icon*/
+void Draw_Icon(uint8_t icon);
+
 
 /*Draw Time according to Time_i */
 void Draw_Time(const Thermostat_t *Thermostat);

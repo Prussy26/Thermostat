@@ -94,7 +94,7 @@ void LCD_Init(void)
 	LCD_EntryModeSet(1, 0);	// Incrementing cursor
 	
 	
-	LCD_BrightnessInit(50);
+	LCD_BrightnessInit(100);
 } 
 
 /*Software Reset of LCD Display*/

@@ -33,6 +33,12 @@ uint32_t millis(void)
 	return timer0_ms;
 }
 
+/*Return Time in ms*/
+uint32_t micros(void)
+{
+	return (timer0_ms * 1000) + (TCNT0 << 2); // (ms*1000) + (TCNT*4)
+}
+
 ISR(TIMER0_COMPA_vect) // Counter overflow interrupt
 {
 	timer0_ms++;
@@ -60,41 +66,41 @@ ISR(TIMER0_COMPA_vect) // Counter overflow interrupt
 	//return (((uint32_t)timer1overflowCount << 16) | TCNT1) >> 1; // Current time in us
 //}
 
-void delay_us(uint32_t us) // Busy wait using NOP
-{
-	us -= 2;
-	
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP();
-	_NOP(); // 10xNOP - tested in simulation
-
-	for (; us != 0; --us) // Waiting in for loop
-	{
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP();
-		_NOP(); // 10xNOP - tested in simulation and on board
-	}
-}
-
-//void delay_us(uint32_t us) // Busy wait using timer
+//void delay_us(uint32_t us) // Busy wait using NOP
 //{
-	//timer1overflowCount = 0;		// Reseting overflowCouter
-	//uint32_t t0 = getTime();		// Get initial time
-	//while ((us + t0) >= getTime()); // Busy wait
+	//us -= 2;
+	//
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP();
+	//_NOP(); // 10xNOP - tested in simulation
+//
+	//for (; us != 0; --us) // Waiting in for loop
+	//{
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP();
+		//_NOP(); // 10xNOP - tested in simulation and on board
+	//}
 //}
+
+void delay_us(uint32_t us) // Busy wait using timer
+{
+	//timer1overflowCount = 0;		// Reseting overflowCouter
+	uint32_t t0 = micros();		// Get initial time
+	while ((us + t0) >= micros()); // Busy wait
+}
 
 

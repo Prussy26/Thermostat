@@ -188,8 +188,7 @@ ISR(PCINT1_vect)
 			{
 				SET_BIT(Encoder.ENCSR,ENCSP);  // Set Short Press Flag
 				CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
-			}
-			
+			}			
 		}
 		ReadButton(); 
 		Encoder.PrevButtonTime = millis();	
