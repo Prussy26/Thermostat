@@ -24,8 +24,6 @@ volatile uint16_t Uref = 0;
 /*---------------------------------------*/
 /*Public*/
 
-Thermistor_t Thermistor = { 10, 3895, 0};
-
 /*-------------------------------------------*/
 /*Functions*/
 
@@ -33,7 +31,7 @@ Thermistor_t Thermistor = { 10, 3895, 0};
 /*Public*/
 
 /*Initializing Thermistor*/
-void Thermistor_Init(uint8_t uref)
+void Thermistor_Init(const uint8_t uref)
 {
 	ADC_Init(uref);	
 	if(uref == AVCC) Uref = 5000;
@@ -51,10 +49,10 @@ void Thermistor_Init(uint8_t uref)
 //}
 
 /*Returning Thermistor Temperature in °Cx10*/
-uint16_t Thermistor_GetTemperatureX10(uint8_t pin)
+uint16_t Thermistor_GetTemperatureX10(const Thermistor_t *Thermistor, const uint8_t pin)
 {
 	float ADCvalue = ADC_Read(pin);
 	float U = (ADCvalue * Uref) / 1023;
 	float R = (( (U * VR1) / (Uref - U) ) - R3);
-	return (10 * (((float)Thermistor.B / ( log(R / (((float)Thermistor.R0*1000) * exp(-(float)Thermistor.B / (T0 + 273.15) ))))) - 273.15)) + Thermistor.Offset;
+	return (10 * (((float)Thermistor->B / ( log(R / (((float)Thermistor->R0*1000) * exp(-(float)Thermistor->B / (T0 + 273.15) ))))) - 273.15)) + Thermistor->Offset;
 }

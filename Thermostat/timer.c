@@ -45,7 +45,6 @@ ISR(TIMER0_COMPA_vect) // Counter overflow interrupt
 }
 
 
-
 // Timer1 ----------------------------------------------------------
 
 //void timerInit(void) // Initializing timer

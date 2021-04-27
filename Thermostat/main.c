@@ -5,6 +5,9 @@
  * Author : xprusa06
  */ 
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <avr/sleep.h>
 
 #include "Bit.h"
 
@@ -62,6 +65,18 @@ int main(void)
     {	
 		Periodic_Tasks_Run(Thermostat_p);		
 		Control(Thermostat_p);
+		
+		//set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+		//cli();
+		//if (some_condition)
+		//{
+			//sleep_enable();
+			////sleep_bod_disable();
+			//sei();
+			//sleep_cpu();
+			//sleep_disable();
+		//}
+		//sei();
     }
 }
 

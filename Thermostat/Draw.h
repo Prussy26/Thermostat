@@ -25,6 +25,7 @@
 #define DRAW_MENU1 LCD_PAGE1 + LCD_ROW1_START + 1
 #define DRAW_MENU2 LCD_PAGE1 + LCD_ROW2_START + 1
 
+#define DRAW_HYSTERESIS LCD_PAGE1 + LCD_ROW1_END - 3
 #define DRAW_BRIGHTNESS LCD_PAGE1 + LCD_ROW1_END - 3
 
 /*--------------------Variables--------------------*/
@@ -74,5 +75,8 @@ void Draw_Time(const Thermostat_t *Thermostat);
 /*Draw Menu*/
 void Draw_Menu(const Thermostat_t *Thermostat);
 
+/*Draw Hysteresis Value*/
+void Draw_Hysteresis(const uint8_t hysteresis);
+
 /*Draw Brightness Value*/
-void Draw_Brightness(const uint8_t Brightness);
+void Draw_Brightness(const uint8_t brightness);

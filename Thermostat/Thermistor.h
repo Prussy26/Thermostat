@@ -24,7 +24,6 @@ typedef struct Thermistor_t
 	int8_t Offset; // Offset in (°C x 10)
 } Thermistor_t;
 
-extern Thermistor_t Thermistor; 
 
 /*--------------------Functions--------------------*/
 
@@ -35,4 +34,4 @@ void Thermistor_Init(uint8_t uref);
 //uint16_t Thermistor_GetTemperature(uint8_t pin);
 
 /*Returning Thermistor Temperature in °Cx10*/
-uint16_t Thermistor_GetTemperatureX10(uint8_t pin);
+uint16_t Thermistor_GetTemperatureX10(const Thermistor_t *Thermistor ,const uint8_t pin);

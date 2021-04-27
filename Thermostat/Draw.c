@@ -193,31 +193,6 @@ void Draw_Time(const Thermostat_t *Thermostat)
 			//LCD_SetPosition(DRAW_MIN + 1);
 		break;	
 	}	
-		//if (Thermostat->Time_i + 1 == Min)
-		//{
-			//Draw_Minutes(Thermostat->Time);
-			//LCD_SetPosition(DRAW_MIN + 1);
-		//}
-		//else if (Thermostat->Time_i + 1 == Hour)
-		//{
-			//Draw_Hours(Thermostat->Time);
-			//LCD_SetPosition(DRAW_HOUR + 1);
-		//}		
-		//else if (Thermostat->Time_i + 1 == Day)
-		//{
-			//Draw_Day(Thermostat->Time);
-			//LCD_SetPosition(DRAW_DAY + 1);
-		//}		
-		//else if (Thermostat->Time_i + 1 == Date)
-		//{
-			//Draw_Date(Thermostat->Time);
-			//LCD_SetPosition(DRAW_DATE + 1);
-		//}		
-		//else if (Thermostat->Time_i + 1 == Month)
-		//{
-			//Draw_Month(Thermostat->Time);
-			//LCD_SetPosition(DRAW_MONTH + 1);
-		//}
 }
 
 
@@ -270,9 +245,17 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 	}
 }
 
+/*Draw Hysteresis Value*/
+void Draw_Hysteresis(const uint8_t hysteresis)
+{
+	LCD_SetPosition(DRAW_HYSTERESIS);
+	fprintf(&LCD_Stream, "%2u.", hysteresis / 10);
+	fprintf(&LCD_Stream, "%1u", hysteresis - (hysteresis/10) * 10);
+}
+
 /*Draw Brightness Value*/
-void Draw_Brightness(const uint8_t Brightness)
+void Draw_Brightness(const uint8_t brightness)
 {
 	LCD_SetPosition(DRAW_BRIGHTNESS);
-	fprintf(&LCD_Stream, "%3u", Brightness);
+	fprintf(&LCD_Stream, "%3u", brightness);
 }
