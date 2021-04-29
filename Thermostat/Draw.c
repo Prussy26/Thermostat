@@ -47,10 +47,11 @@ char Menu_Text[Menu_Size][LCD_COLS] = {
 
 /*Draw Front Frame of the LCD Display*/
 void Draw_Frame(const Thermostat_t *Thermostat)
-{
-	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE0 + 4);
+{	
+	/*Draw Front Page*/
+	LCD_GoTo(LCD_PAGE0);
+	LCD_SetPosition(DRAW_TEMP + 4);
 	fprintf(&LCD_Stream, "°C");
-	
 	LCD_SetPosition(DRAW_STEMP);
 	fprintf(&LCD_Stream, "%02u.", Thermostat->Parameters->Regulator.Temperature / 10);
 	fprintf(&LCD_Stream, "%1u°C", Thermostat->Parameters->Regulator.Temperature - (Thermostat->Parameters->Regulator.Temperature / 10) * 10);
@@ -62,12 +63,7 @@ void Draw_Frame(const Thermostat_t *Thermostat)
 	fprintf(&LCD_Stream, "Mo 00/00");
 	
 	/*Draw Menu*/
-	//LCD_GoTo(LCD_PAGE1);
-	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1);
-	LCD_DrawChar(0x7E);
-	fprintf(&LCD_Stream, "%s", Menu_Text[0]);
-	LCD_SetPosition(DRAW_MENU2);
-	fprintf(&LCD_Stream, "%s", Menu_Text[1]);
+	Draw_Menu(Thermostat);
 }
 
 
@@ -199,7 +195,8 @@ void Draw_Time(const Thermostat_t *Thermostat)
 /*Draw Menu*/
 void Draw_Menu(const Thermostat_t *Thermostat)
 {
-	LCD_SetPosition(DRAW_MENU1);
+	LCD_SetPosition(DRAW_MENU1 - 1);
+	LCD_DrawChar(0x7E);
 	switch(Thermostat->Menu_i)
 	{
 		case Hysteresis_Set:
@@ -221,7 +218,8 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 		break;
 	}
 	
-	LCD_SetPosition(DRAW_MENU2);
+	LCD_SetPosition(DRAW_MENU2 - 1);
+	LCD_DrawChar(' ');
 	switch(Thermostat->Menu_i + 1)
 	{
 		case Hysteresis_Set:
@@ -241,6 +239,102 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 		
 		default:
 			fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i + 1]);
+		break;
+	}
+}
+
+
+/*Draw Temperature Program Frame*/
+void Draw_TempProgramFrame(const Thermostat_t* Thermostat)
+{
+	LCD_GoTo(LCD_PAGE1);
+	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1);
+	switch(Thermostat->Program_i)
+	{		
+		case WorkDays:
+			fprintf(&LCD_Stream, "WorkDays ");
+		break;
+		
+		case Weekend:
+			fprintf(&LCD_Stream, "Weekend  ");
+		break;
+	}
+			
+	//LCD_SetPosition(DRAW_TEMP_H - 1);
+	fprintf(&LCD_Stream, "|%2u.", Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_H_Program] / 10);
+	fprintf(&LCD_Stream, "%1u", Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_H_Program] - (Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_H_Program]/10) * 10);
+	fprintf(&LCD_Stream, "°C");
+	LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1);
+	fprintf(&LCD_Stream, "Temp     ");
+	//LCD_DrawChar(0x7E);
+	fprintf(&LCD_Stream, "|%2u.", Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_L_Program] / 10);
+	fprintf(&LCD_Stream, "%1u", Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_L_Program] - (Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_L_Program]/10) * 10);
+	fprintf(&LCD_Stream, "°C");
+	LCD_SetPosition(DRAW_TEMP_H + 3);
+}
+
+
+/*Draw Time Program Frame*/
+void Draw_TimeProgramFrame(const Thermostat_t* Thermostat)
+{
+	LCD_GoTo(LCD_PAGE1);			
+	LCD_ClearSpace(DRAW_TEMP_H - 1, 7);
+
+	LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1);
+	fprintf(&LCD_Stream, "Temp %02u:%02u", Thermostat->Parameters->Program[Thermostat->Program_i].Time[Time_Start_Hour_Program] , Thermostat->Parameters->Program[Thermostat->Program_i].Time[Time_Start_Min_Program]);
+	LCD_DrawChar(0x7E);
+	fprintf(&LCD_Stream, "%02u:%02u", Thermostat->Parameters->Program[Thermostat->Program_i].Time[Time_Stop_Hour_Program] , Thermostat->Parameters->Program[Thermostat->Program_i].Time[Time_Stop_Min_Program]);
+	LCD_SetPosition(DRAW_TIME_START_HOUR + 1);
+}
+
+
+void Draw_ProgramTemp(const Thermostat_t* Thermostat)
+{
+	switch (Thermostat->ProgramTempSet_i)
+	{
+		case Temp_H_Program:
+			LCD_SetPosition(DRAW_TEMP_H);
+			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_H_Program] / 10);
+			fprintf(&LCD_Stream, "%1u", Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_H_Program] - (Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_H_Program]/10) * 10);
+			LCD_SetPosition(DRAW_TEMP_H + 3);
+		break;
+		
+		case Temp_L_Program:
+			LCD_SetPosition(DRAW_TEMP_L);
+			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_L_Program] / 10);
+			fprintf(&LCD_Stream, "%1u", Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_L_Program] - (Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_L_Program]/10) * 10);
+			LCD_SetPosition(DRAW_TEMP_L + 3);
+		break;
+	}
+	
+}
+
+void Draw_ProgramTime(const Thermostat_t* Thermostat)
+{
+	switch (Thermostat->ProgramTimeSet_i)
+	{	
+		case Time_Start_Hour_Program:
+			LCD_SetPosition(DRAW_TIME_START_HOUR);
+			fprintf(&LCD_Stream, "%02u", Thermostat->Parameters->Program[Thermostat->Program_i].Time[Time_Start_Hour_Program]);
+			LCD_SetPosition(DRAW_TIME_START_HOUR + 1);
+		break;
+		
+		case Time_Start_Min_Program:
+			LCD_SetPosition(DRAW_TIME_START_MIN);
+			fprintf(&LCD_Stream, "%02u", Thermostat->Parameters->Program[Thermostat->Program_i].Time[Time_Start_Min_Program]);
+			LCD_SetPosition(DRAW_TIME_START_MIN + 1);
+		break;
+		
+		case Time_Stop_Hour_Program:
+			LCD_SetPosition(DRAW_TIME_STOP_HOUR);
+			fprintf(&LCD_Stream, "%02u", Thermostat->Parameters->Program[Thermostat->Program_i].Time[Time_Stop_Hour_Program]);
+			LCD_SetPosition(DRAW_TIME_STOP_HOUR + 1);
+		break;
+		
+		case Time_Stop_Min_Program:
+			LCD_SetPosition(DRAW_TIME_STOP_MIN);
+			fprintf(&LCD_Stream, "%02u", Thermostat->Parameters->Program[Thermostat->Program_i].Time[Time_Stop_Min_Program]);
+			LCD_SetPosition(DRAW_TIME_STOP_MIN + 1);
 		break;
 	}
 }

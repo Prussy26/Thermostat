@@ -16,6 +16,8 @@
 
 uint8_t PTR = 0xFF;
  
+uint8_t Program_TimeMax [4] = { 24 , 60 , 24 , 60};
+uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN , DRAW_TIME_STOP_HOUR , DRAW_TIME_STOP_MIN };
  
  /*--------------------Functions--------------------*/
 
@@ -120,41 +122,53 @@ uint8_t PTR = 0xFF;
  {
 	 switch(Thermostat->State)
 	 {
-		 case Default_State:
-			 DefaultState(Thermostat);
-		 break;
-		 
-		 case TempSet_State:
+		case Default_State:
+			DefaultState(Thermostat);
+		break;
+		
+		case TempSet_State:
 			TempSetState(Thermostat);
-		 break;
-		 
-		 case Menu_State:
+		break;
+		
+		case Menu_State:
 			MenuState(Thermostat);
-		 break;
-		 
-		 case TimeSet_State:
-			 TimeSetState(Thermostat);
-		 break;
-		 
-		 case ThermistorOffSet_State:
-			 ThermistorOffSetState(Thermostat);
-		 break;
-		 
-		 case HysteresisSet_State:
+		break;
+		
+		case TimeSet_State:
+			TimeSetState(Thermostat);
+		break;
+		
+		case ThermistorOffSet_State:
+			ThermistorOffSetState(Thermostat);
+		break;
+		
+		case ProgramChoose_State:
+			ProgramChooseState(Thermostat);
+		break;
+		
+		case ProgramTempSet_State:
+			ProgramTempSetState(Thermostat);
+		break;
+		
+		case ProgramTimeSet_State:
+			ProgramTimeSetState(Thermostat);
+		break;
+		
+		case HysteresisSet_State:
 			HysteresisSetState(Thermostat);
-		 break;
-		 
-		 case BrightnessSet_State:
+		break;
+		
+		case BrightnessSet_State:
 			BrightnessSetState(Thermostat);
-		 break;
+		break;
 
 		 
-		 default:
-		 LCD_SetPosition(DRAW_ICON);
-		 fprintf(&LCD_Stream, "!");
-		 
-		 To_DefaultState(Thermostat);
-		 break;
+		default:
+			LCD_SetPosition(DRAW_ICON);
+			fprintf(&LCD_Stream, "!");
+		
+			To_DefaultState(Thermostat);
+		break;
 	 }
  }
 
@@ -242,7 +256,7 @@ void To_MenuState(Thermostat_t *Thermostat)
  {
 	 LCD_GoTo(LCD_PAGE1);
 	 LCD_CursorOFF();
-	 
+	 Draw_Menu(Thermostat);
 	 SET_BIT(PTR,PTREN);
 	 
 	 Thermostat->State = Menu_State;
@@ -254,32 +268,32 @@ void MenuState(Thermostat_t *Thermostat)
 	  {
 		  case Short_Press:
 		  
-		  To_Menui(Thermostat);
+			To_Menui(Thermostat);
 		  break;
 		  
 		  case Long_Press:
 		  
-		  To_DefaultState(Thermostat);
+			To_DefaultState(Thermostat);
 		  break;
 		  
 		  case Shift_Left:
-		  if (Thermostat->Menu_i > 0)
-		  {
-			  Thermostat->Menu_i--;
-			  Draw_Menu(Thermostat);
-		  }
+			  if (Thermostat->Menu_i > 0)
+			  {
+				  Thermostat->Menu_i--;
+				  Draw_Menu(Thermostat);
+			  }
 		  break;
 		  
 		  case Shift_Right:
-		  if (Thermostat->Menu_i < Menu_Size - 1)
-		  {
-			  Thermostat->Menu_i++;
-			  Draw_Menu(Thermostat);
-		  }
+			  if (Thermostat->Menu_i < Menu_Size - 1)
+			  {
+				  Thermostat->Menu_i++;
+				  Draw_Menu(Thermostat);
+			  }
 		  break;
 		  
 		  case Timeout:
-		  To_DefaultState(Thermostat);
+			To_DefaultState(Thermostat);
 		  break;
 	  }
   }
@@ -297,8 +311,8 @@ void To_Menui(Thermostat_t *Thermostat)
 			To_ThermistorOffSetState(Thermostat);
 		 break;
 		 
-		 case Programs_Set:
-		 //To_ProgramState();
+		 case Program_Set:
+			To_ProgramChooseState(Thermostat);
 		 break;
 		 
 		 case Hysteresis_Set:
@@ -371,6 +385,7 @@ void TimeSetState(Thermostat_t *Thermostat)
  }
  
 
+
 void To_ThermistorOffSetState(Thermostat_t *Thermostat)
  {
 	 LCD_GoTo(LCD_PAGE0);
@@ -424,21 +439,204 @@ void ThermistorOffSetState(Thermostat_t *Thermostat)
   }
   
 
-void To_ProgramState(Thermostat_t *Thermostat)
- {
-	 //LCD_SetPosition(DRAW_TEMP + 3);
-	 LCD_CursorON();
-	 
-	 CLR_BIT(PTR,PTREN);
-	 
-	 Thermostat->State = Default_State;
- }
- 
-void ProgramState(Thermostat_t *Thermostat)
-  {
-	  
-  }
+void To_ProgramChooseState(Thermostat_t *Thermostat)
+{
+	LCD_GoTo(LCD_PAGE1);
+	Thermostat->Program_i = WorkDays;
+	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1);
+	fprintf(&LCD_Stream, "%cWorkDays       ", 0x7E);
+	LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1);
+	fprintf(&LCD_Stream, " Weekend         ");
+	
+	CLR_BIT(PTR,PTREN);
+	
+	Thermostat->State = ProgramChoose_State;
+}
+
+
+void ProgramChooseState(Thermostat_t *Thermostat)
+{
+	switch(Encoder_Get())
+	{
+		case Short_Press:
+			To_ProgramTempSetState(Thermostat);
+		break;
+		
+		case Long_Press:
+			To_MenuState(Thermostat);
+		break;
+		
+		case Shift_Left:
+			if (Thermostat->Program_i > 0)
+			{
+				Thermostat->Program_i--;
+				LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1);
+				LCD_DrawChar(0x7E);
+				LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1);
+				LCD_DrawChar(' ');
+			}
+		break;
+		
+		case Shift_Right:
+			if (Thermostat->Program_i < Program_Size - 1)
+			{
+				Thermostat->Program_i++;
+				LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1);
+				LCD_DrawChar(' ');
+				LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1);
+				LCD_DrawChar(0x7E);
+			}
+		break;
+		
+		case Timeout:
+			To_DefaultState(Thermostat);
+		break;
+	}
+}
   
+  
+void To_ProgramTempSetState(Thermostat_t *Thermostat)
+{
+	Thermostat->ProgramTempSet_i = Temp_H_Program;
+	Draw_TempProgramFrame(Thermostat);
+	LCD_CursorON();
+	
+	CLR_BIT(PTR,PTREN);
+	
+	Thermostat->State = ProgramTempSet_State;
+}
+
+
+void ProgramTempSetState(Thermostat_t *Thermostat)
+{
+	switch(Encoder_Get())
+	{
+		case Short_Press:
+			if(Thermostat->ProgramTempSet_i < Temp_L_Program)
+			{
+				Thermostat->ProgramTempSet_i++;
+				LCD_SetPosition(DRAW_TEMP_L + 3);
+				/*If Hight temperature is lower then Low temperature (needs to be corrected)*/
+				if(Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_L_Program] >= Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_H_Program])
+				{
+					Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_L_Program] = Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_H_Program] - 1;
+					Draw_ProgramTemp(Thermostat);
+				}
+			}
+			else
+			{
+				To_ProgramTimeSetState(Thermostat);
+			}
+		break;
+		
+		case Long_Press:
+			//Save_Program(Thermostat);
+			To_MenuState(Thermostat);
+		break;
+		
+		case Shift_Left:
+			if (Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Thermostat->ProgramTempSet_i] > 100)
+			{
+				Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Thermostat->ProgramTempSet_i]--;
+				Draw_ProgramTemp(Thermostat);
+			}
+		break;
+		
+		case Shift_Right:
+			if (Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Thermostat->ProgramTempSet_i] < 300)
+			{
+				if((Thermostat->ProgramTempSet_i == Temp_H_Program) || (Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_L_Program] < Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Temp_H_Program]))
+					{
+						Thermostat->Parameters->Program[Thermostat->Program_i].Temp[Thermostat->ProgramTempSet_i]++;
+						Draw_ProgramTemp(Thermostat);
+					}					
+			}
+		break;
+		
+		case Timeout:
+			//Save_Program(Thermostat);
+			To_DefaultState(Thermostat);
+		break;
+	}
+}
+
+void To_ProgramTimeSetState(Thermostat_t *Thermostat)
+{
+	Thermostat->ProgramTimeSet_i = Time_Start_Hour_Program;
+	Draw_TimeProgramFrame(Thermostat);
+	
+	CLR_BIT(PTR,PTREN);
+	
+	Thermostat->State = ProgramTimeSet_State;
+}
+
+
+void ProgramTimeSetState(Thermostat_t *Thermostat)
+{
+	switch(Encoder_Get())
+	{
+		case Short_Press:
+			if(Thermostat->ProgramTimeSet_i < Time_Stop_Min_Program)
+			{
+				Thermostat->ProgramTimeSet_i++;
+				LCD_SetPosition(Program_TimePossition[Thermostat->ProgramTimeSet_i] + 1);
+				
+				///*When Start time is set up check if it isn't higher then Stop time*/
+				//if(Thermostat->ProgramTimeSet_i == Time_Stop_Hour_Program)
+				//{	
+					///*If it is increase stop time to correct value*/			
+					//if(Thermostat->Parameters->Program->Time[Time_Start_Hour_Program] >= Thermostat->Parameters->Program->Time[Time_Stop_Hour_Program])
+					//{
+						//Thermostat->Parameters->Program->Time[Time_Stop_Hour_Program] = Thermostat->Parameters->Program->Time[Time_Start_Hour_Program];
+						//Draw_ProgramTime(Thermostat);
+					//}			
+				//}
+				//else if(Thermostat->ProgramTimeSet_i == Time_Stop_Min_Program)
+				//{	
+					///*If it is increase stop time to correct value*/			
+					//if(Thermostat->Parameters->Program->Time[Time_Start_Min_Program] >= Thermostat->Parameters->Program->Time[Time_Stop_Min_Program])
+					//{
+						//Thermostat->Parameters->Program->Time[Time_Stop_Min_Program] = Thermostat->Parameters->Program->Time[Time_Start_Min_Program];
+						//Draw_ProgramTime(Thermostat);
+					//}			
+				//}
+			}
+			else
+			{
+				//Save_Program(Thermostat);
+				To_MenuState(Thermostat);
+			}
+		break;
+		
+		case Long_Press:
+			//Save_Program(Thermostat);
+			To_MenuState(Thermostat);
+		break;
+		
+		case Shift_Left:
+			if (Thermostat->Parameters->Program[Thermostat->Program_i].Time[Thermostat->ProgramTimeSet_i] > 0)
+			{
+				Thermostat->Parameters->Program[Thermostat->Program_i].Time[Thermostat->ProgramTimeSet_i]--;
+				Draw_ProgramTime(Thermostat);		
+			}
+		break;
+		
+		case Shift_Right:
+			if (Thermostat->Parameters->Program[Thermostat->Program_i].Time[Thermostat->ProgramTimeSet_i] < Program_TimeMax[Thermostat->ProgramTimeSet_i])
+			{
+				Thermostat->Parameters->Program[Thermostat->Program_i].Time[Thermostat->ProgramTimeSet_i]++;
+				Draw_ProgramTime(Thermostat);
+			}
+		break;
+		
+		case Timeout:
+			//Save_Program(Thermostat);
+			To_DefaultState(Thermostat);
+		break;
+	}
+}
+
+
   
 void To_HysteresisSetState(Thermostat_t *Thermostat)
 {

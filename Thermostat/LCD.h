@@ -74,8 +74,7 @@
 /*Start addresses of 4 Pages*/
 #define LCD_PAGE0		0x00	
 #define LCD_PAGE1		0x10
-#define LCD_PAGE2		0x20
-#define LCD_PAGE3		0x30
+#define LCD_END_PAGE	0x27
 
 
 /*Defining Instructions*/

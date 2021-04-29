@@ -12,12 +12,12 @@
 #include "Bit.h"
 
 #include "Thermostat.h"
-#include "Thermistor.h"
-#include "Regulator.h"
-#include "RTC.h"
-#include "Encoder.h"
-#include "LCD.h"
-#include "Draw.h"
+//#include "Thermistor.h"
+//#include "Regulator.h"
+//#include "RTC.h"
+//#include "Encoder.h"
+//#include "LCD.h"
+//#include "Draw.h"
 
 int main(void)
 {

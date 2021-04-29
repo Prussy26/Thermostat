@@ -12,18 +12,26 @@
 
 /*--------------------Constants--------------------*/
 
-#define DRAW_TEMP	LCD_PAGE0 + LCD_ROW1_START
-#define DRAW_STEMP	LCD_PAGE0 + LCD_ROW2_START
-#define DRAW_MIN	LCD_PAGE0 + LCD_ROW1_START + 12
-#define DRAW_HOUR	LCD_PAGE0 + LCD_ROW1_START + 9
-#define DRAW_DAY	LCD_PAGE0 + LCD_ROW2_START + 8
-#define DRAW_DATE	LCD_PAGE0 + LCD_ROW2_START + 11
-#define DRAW_MONTH	LCD_PAGE0 + LCD_ROW2_START + 14
+#define DRAW_TEMP		LCD_PAGE0 + LCD_ROW1_START
+#define DRAW_STEMP		LCD_PAGE0 + LCD_ROW2_START
+#define DRAW_MIN		LCD_PAGE0 + LCD_ROW1_START + 12
+#define DRAW_HOUR		LCD_PAGE0 + LCD_ROW1_START + 9
+#define DRAW_DAY		LCD_PAGE0 + LCD_ROW2_START + 8
+#define DRAW_DATE		LCD_PAGE0 + LCD_ROW2_START + 11
+#define DRAW_MONTH		LCD_PAGE0 + LCD_ROW2_START + 14
 
-#define DRAW_ICON	LCD_PAGE0 + LCD_ROW1_END
+#define DRAW_ICON		LCD_PAGE0 + LCD_ROW1_END
 
-#define DRAW_MENU1 LCD_PAGE1 + LCD_ROW1_START + 1
-#define DRAW_MENU2 LCD_PAGE1 + LCD_ROW2_START + 1
+#define DRAW_MENU1		LCD_PAGE1 + LCD_ROW1_START + 1
+#define DRAW_MENU2		LCD_PAGE1 + LCD_ROW2_START + 1
+
+#define DRAW_TEMP_H		LCD_PAGE1 + LCD_ROW1_START + 10
+#define DRAW_TEMP_L		LCD_PAGE1 + LCD_ROW2_START + 10
+
+#define DRAW_TIME_START_HOUR	LCD_PAGE1 + LCD_ROW2_START + 5
+#define DRAW_TIME_START_MIN		LCD_PAGE1 + LCD_ROW2_START + 8
+#define DRAW_TIME_STOP_HOUR		LCD_PAGE1 + LCD_ROW2_START + 11
+#define DRAW_TIME_STOP_MIN		LCD_PAGE1 + LCD_ROW2_START + 14
 
 #define DRAW_HYSTERESIS LCD_PAGE1 + LCD_ROW1_END - 3
 #define DRAW_BRIGHTNESS LCD_PAGE1 + LCD_ROW1_END - 3
@@ -32,7 +40,7 @@
 
 extern uint8_t Time_Position[5];
 
-enum Menu_i { Time_Set = 0 , Temperature_Set , Programs_Set , Hysteresis_Set , Brightness_Set , Menu_Size};
+
 
 enum Icon { No_Icon, Cooling_Icon, Heating_Icon , Error_Icon};
 	
@@ -74,6 +82,18 @@ void Draw_Time(const Thermostat_t *Thermostat);
 
 /*Draw Menu*/
 void Draw_Menu(const Thermostat_t *Thermostat);
+
+/*Draw Temperature Program Frame*/
+void Draw_TempProgramFrame(const Thermostat_t* Thermostat);
+
+/*Draw Time Program Frame*/
+void Draw_TimeProgramFrame(const Thermostat_t* Thermostat);
+
+/*Draw Program Temperature*/
+void Draw_ProgramTemp(const Thermostat_t* Thermostat);
+
+/*Draw Program Time*/
+void Draw_ProgramTime(const Thermostat_t* Thermostat);
 
 /*Draw Hysteresis Value*/
 void Draw_Hysteresis(const uint8_t hysteresis);

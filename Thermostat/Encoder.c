@@ -34,15 +34,48 @@
 #define ENCLS	6 // Encoder Left Shift
 #define ENCRS	7 // Encoder Right Shift
 
+
+// No complete step yet.
+#define ENCODER_DIR_NONE	0x00
+// Clockwise step.
+#define ENCODER_DIR_CW		0x10
+// Anti-clockwise step.
+#define ENCODER_DIR_CCW		0x20
+
+#define ENCODER_START		0
+#define ENCODER_CW_FINAL	1
+#define ENCODER_CW_BEGIN	2
+#define ENCODER_CW_NEXT		3
+#define ENCODER_CCW_BEGIN	4
+#define ENCODER_CCW_FINAL	5
+#define ENCODER_CCW_NEXT	6
+
+const uint8_t Encoder_StateTable [7][4] = {
+  // ENCODER_START
+  {ENCODER_START,    ENCODER_CW_BEGIN,  ENCODER_CCW_BEGIN, ENCODER_START},
+  // ENCODER_CW_FINAL
+  {ENCODER_CW_NEXT,  ENCODER_START,     ENCODER_CW_FINAL,  ENCODER_START | ENCODER_DIR_CW},
+  // ENCODER_CW_BEGIN
+  {ENCODER_CW_NEXT,  ENCODER_CW_BEGIN,  ENCODER_START,     ENCODER_START},
+  // ENCODER_CW_NEXT
+  {ENCODER_CW_NEXT,  ENCODER_CW_BEGIN,  ENCODER_CW_FINAL,  ENCODER_START},
+  // ENCODER_CCW_BEGIN
+  {ENCODER_CCW_NEXT, ENCODER_START,     ENCODER_CCW_BEGIN, ENCODER_START},
+  // ENCODER_CCW_FINAL
+  {ENCODER_CCW_NEXT, ENCODER_CCW_FINAL, ENCODER_START,     ENCODER_START | ENCODER_DIR_CCW},
+  // ENCODER_CCW_NEXT
+  {ENCODER_CCW_NEXT, ENCODER_CCW_FINAL, ENCODER_CCW_BEGIN, ENCODER_START},
+};
+
+
 typedef struct Encoder_t 
 {
 	uint8_t ENCSR;				// Encoder State Register
-	//uint8_t PrevButtonState;	// Previous Button State
-	uint32_t PrevEncoderTime;	// Previous Encoder Tick Time
-	uint32_t PrevButtonTime;	// Previous Button Click Time
+	uint8_t State;		// EncoderState
+	uint32_t PrevTime;	// Previous Encoder Tick Time
 } Encoder_t;
 
-Encoder_t Encoder = { .ENCSR = (1<<ENCEN) | (1<<ENCSEN) , 0 , 0};
+Encoder_t Encoder = { .ENCSR = (1<<ENCEN) | (1<<ENCSEN) , .State = ENCODER_START , .PrevTime = 0 };
 
 // Private Functions --------------------------------------------------
 
@@ -93,6 +126,9 @@ void Encoder_Init(void)
 	
 	/*Initializing Interrupts*/
 	EIMSK |= (1<<INT0);		//Encoder Interrupt pin
+	EICRA |= (1<<ISC00);	//Encoder Logical Change Interrupt Set
+	PCICR |= (1<<PCIE0);
+	PCMSK0 |= (1<<PCINT4);
 	PCICR |= (1<<PCIE1);	// PCINT7...PCINT0 Interrupt Enabled
 	PCMSK1 |= (1<<PCINT8);	// PCINT5 Interrupt Enabled
 	
@@ -111,7 +147,7 @@ uint8_t Encoder_Get(void)
 		//CLR_BIT(Encoder.ENCSR,ENCPEN);
 		return Short_Press;
 	}
-	if(millis() >= (Encoder.PrevButtonTime + LONG_PRESS_TIME) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
+	if(millis() >= (Encoder.PrevTime + LONG_PRESS_TIME) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
 	{
 		CLR_BIT(Encoder.ENCSR,ENCPEN);
 		return Long_Press;
@@ -128,13 +164,9 @@ uint8_t Encoder_Get(void)
 	}
 	
 	/*Timeout Control*/
-	if(Encoder.PrevButtonTime > Encoder.PrevEncoderTime)
+	if(Encoder.PrevTime > Encoder.PrevTime)
 	{
-		if(millis() >= Encoder.PrevButtonTime + TIMEOUT) return Timeout;
-	}
-	else
-	{
-		if(millis() >= Encoder.PrevEncoderTime + TIMEOUT) return Timeout;
+		if(millis() >= Encoder.PrevTime + TIMEOUT) return Timeout;
 	}
 	
 	return No_Action;
@@ -142,39 +174,49 @@ uint8_t Encoder_Get(void)
 
 void Encoder_millisCheck(void) // Overflow protection reset
 {
-	if(millis() < Encoder.PrevButtonTime) 
+	if(millis() < Encoder.PrevTime) 
 	{
-		Encoder.PrevEncoderTime = 0;
-		Encoder.PrevButtonTime = 0; 
+		Encoder.PrevTime = 0;
 	}
 }
 
+
+void Rotate(void)
+{
+		uint8_t pinstate = (ReadB() << 1) | ReadA();
+		// Determine new state from the pins and state table.
+		Encoder.State = Encoder_StateTable[Encoder.State & 0x0F][pinstate];
+		// Return emit bits, ie the generated event.
+		uint8_t Result = Encoder.State & 0x30;
+
+		if (Result == ENCODER_DIR_CW)
+		{
+			SET_BIT(Encoder.ENCSR,ENCRS); // Right Shift
+		} 
+		else if (Result == ENCODER_DIR_CCW) 
+		{
+			SET_BIT(Encoder.ENCSR,ENCLS); // Left Shift
+		}
+		Encoder.PrevTime = millis();
+}
 
 // Interrupts --------------------------------------------------
 
 ISR(INT0_vect)
 {	
-	//if((GET_BIT(Encoder.ENCSR,ENCSEN) != 0))
-	//{
-		if(millis() >= (Encoder.PrevEncoderTime + DEBOUNC_TIME_ENCODER))
-		{
-			if(ReadB() == 0)
-			{
-				SET_BIT(Encoder.ENCSR,ENCRS); // Left Shift
-			}
-			else 
-			{
-				SET_BIT(Encoder.ENCSR,ENCLS); // Left Shift
-			}
-			Encoder.PrevEncoderTime = millis();
-		}	
-	//}
+	Rotate();
+
+}
+
+ISR(PCINT0_vect)
+{	
+	Rotate();
 }
 
 ISR(PCINT1_vect)
 {
 	
-	if(millis() >= (Encoder.PrevButtonTime + DEBOUNC_TIME_BUTTON))
+	if(millis() >= (Encoder.PrevTime + DEBOUNC_TIME_BUTTON))
 	{	
 		cli();	 	
 		if((GET_BIT(Encoder.ENCSR,ENCPBS) == 0)) // Button is Pushed
@@ -184,14 +226,14 @@ ISR(PCINT1_vect)
 		else// if((GET_BIT(Encoder.ENCSR,ENCPBS) != 0)) // Button is Released
 		{
 			/*If Released before Long Press then its Short Press*/
-			if((millis() <= (Encoder.PrevButtonTime + LONG_PRESS_TIME)) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
+			if((millis() <= (Encoder.PrevTime + LONG_PRESS_TIME)) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
 			{
 				SET_BIT(Encoder.ENCSR,ENCSP);  // Set Short Press Flag
 				CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
 			}			
 		}
 		ReadButton(); 
-		Encoder.PrevButtonTime = millis();	
+		Encoder.PrevTime = millis();
 		sei();	
 	}	
 }

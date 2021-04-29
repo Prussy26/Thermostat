@@ -207,7 +207,7 @@ void LCD_DrawChar (const char character)
 /*Put Character into Stream*/
 int LCD_Putchar(const char c, FILE *stream)
 {
-	if ((c == '\n') || (c == '\0')) LCD_Putchar('\r', stream);
+	if (c == '\n') LCD_Putchar('\r', stream);
 	if (c == '°') LCD_DrawChar(0xDF);
 	else LCD_DrawChar(c);
 	return 0;
