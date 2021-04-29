@@ -69,8 +69,8 @@ typedef struct Thermostat_t
 	ThermostatParameters_t *Parameters; // Parameters that needs to be saved to EEPROM						
 } Thermostat_t;
 
-enum Menu_t { Time_Set = 0 , Temperature_Set , Program_Set , Hysteresis_Set , Brightness_Set , Menu_Size};
-enum State_t { Default_State , TempSet_State , Menu_State , TimeSet_State , ThermistorOffSet_State , ProgramChoose_State , ProgramSet_State , ProgramTempSet_State , ProgramTimeSet_State , HysteresisSet_State, BrightnessSet_State ,  Error_State};
+enum Menu_t { Time_Set = 0 , Temperature_Set , Program_Set , Mode_Set , Hysteresis_Set , Brightness_Set , Menu_Size};
+enum State_t { Default_State , TempSet_State , Menu_State , ModeSet_State, TimeSet_State , ThermistorOffSet_State , ProgramChoose_State , ProgramSet_State , ProgramTempSet_State , ProgramTimeSet_State , HysteresisSet_State, BrightnessSet_State ,  Error_State};
 	
 	
 /*--------------------Macros--------------------*/

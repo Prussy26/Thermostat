@@ -37,8 +37,16 @@ char Menu_Text[Menu_Size][LCD_COLS] = {
 	"Time & Date    \0",
 	"Temperature    \0",
 	"Program        \0",
+	"Mode \0",
 	"Hysteresis \0",
 	"Brightness \0"
+};
+
+char Mode_Text[Mode_Size][10] = {
+	"       On\0",
+	"Heat only\0",
+	"Cool only\0",
+	"      Off\0"
 };
 
 
@@ -199,6 +207,11 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 	LCD_DrawChar(0x7E);
 	switch(Thermostat->Menu_i)
 	{
+		case Mode_Set:
+			fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i]);
+			fprintf(&LCD_Stream, " %s", Mode_Text[Thermostat->Parameters->Regulator.Mode]);
+		break;
+		
 		case Hysteresis_Set:
 			fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i]);
 			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Regulator.Hysteresis / 10);
@@ -222,6 +235,11 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 	LCD_DrawChar(' ');
 	switch(Thermostat->Menu_i + 1)
 	{
+		case Mode_Set:
+			fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i + 1]);
+			fprintf(&LCD_Stream, " %s", Mode_Text[Thermostat->Parameters->Regulator.Mode]);
+		break;
+		
 		case Hysteresis_Set:
 			fprintf(&LCD_Stream, "%s", Menu_Text[Thermostat->Menu_i + 1]);
 			fprintf(&LCD_Stream, "%2u.", Thermostat->Parameters->Regulator.Hysteresis / 10);

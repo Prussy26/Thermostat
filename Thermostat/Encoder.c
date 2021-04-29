@@ -164,10 +164,8 @@ uint8_t Encoder_Get(void)
 	}
 	
 	/*Timeout Control*/
-	if(Encoder.PrevTime > Encoder.PrevTime)
-	{
-		if(millis() >= Encoder.PrevTime + TIMEOUT) return Timeout;
-	}
+	if(millis() >= Encoder.PrevTime + TIMEOUT) 
+		return Timeout;
 	
 	return No_Action;
 }

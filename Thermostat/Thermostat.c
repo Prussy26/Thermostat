@@ -458,6 +458,8 @@ void TimeSetState(Thermostat_t *Thermostat)
 		 break;
 		 
 		 case Timeout:
+			RTC_SetTime(Thermostat->Time);
+			PTR = 0xFF;
 			To_DefaultState(Thermostat);
 		 break;
 	 }
