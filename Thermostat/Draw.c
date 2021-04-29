@@ -244,6 +244,66 @@ void Draw_Menu(const Thermostat_t *Thermostat)
 }
 
 
+/*Draw Program Choose Frame*/
+void Draw_ProgramChooseFrame(const Thermostat_t* Thermostat)
+{
+	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1);
+	fprintf(&LCD_Stream, " WorkDays %s", Thermostat->Parameters->Program[WorkDays].Mode ? "Manual" : "Auto  ");
+	LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1);
+	fprintf(&LCD_Stream, " Weekend  %s", Thermostat->Parameters->Program[Weekend].Mode ? "Manual" : "Auto  ");
+	
+	switch(Thermostat->Program_i)
+	{
+		case WorkDays:
+			LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1);
+			LCD_DrawChar(0x7E);
+		break;
+		
+		case Weekend:
+			LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1);
+			LCD_DrawChar(0x7E);
+		break;
+	}	
+}
+
+/*Draw Program Mode*/
+void Draw_ProgramMode(const Thermostat_t* Thermostat)
+{
+	LCD_GoTo(LCD_PAGE1);
+	
+	switch(Thermostat->Program_i)
+	{
+		case WorkDays:
+			LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1 + 10);
+		break;
+		
+		case Weekend:
+			LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1 + 10);
+		break;
+	}
+	
+	if(Thermostat->Parameters->Program[Thermostat->Program_i].Mode == Auto)
+	{
+		fprintf(&LCD_Stream, "Auto  ");
+	}
+	else if(Thermostat->Parameters->Program[Thermostat->Program_i].Mode == Manual)
+	{
+		fprintf(&LCD_Stream, "Manual");		
+	}
+	
+	switch(Thermostat->Program_i)
+	{
+		case WorkDays:
+			LCD_SetPosition(LCD_PAGE1 + LCD_ROW1_END);
+		break;
+		
+		case Weekend:
+			LCD_SetPosition(LCD_PAGE1 + LCD_ROW2_END);
+		break;
+	}	
+}
+
+
 /*Draw Temperature Program Frame*/
 void Draw_TempProgramFrame(const Thermostat_t* Thermostat)
 {
@@ -290,7 +350,7 @@ void Draw_TimeProgramFrame(const Thermostat_t* Thermostat)
 
 void Draw_ProgramTemp(const Thermostat_t* Thermostat)
 {
-	switch (Thermostat->ProgramTempSet_i)
+	switch (Thermostat->ProgramSet_i)
 	{
 		case Temp_H_Program:
 			LCD_SetPosition(DRAW_TEMP_H);
@@ -311,7 +371,7 @@ void Draw_ProgramTemp(const Thermostat_t* Thermostat)
 
 void Draw_ProgramTime(const Thermostat_t* Thermostat)
 {
-	switch (Thermostat->ProgramTimeSet_i)
+	switch (Thermostat->ProgramSet_i)
 	{	
 		case Time_Start_Hour_Program:
 			LCD_SetPosition(DRAW_TIME_START_HOUR);

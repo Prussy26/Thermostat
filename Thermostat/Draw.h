@@ -83,11 +83,17 @@ void Draw_Time(const Thermostat_t *Thermostat);
 /*Draw Menu*/
 void Draw_Menu(const Thermostat_t *Thermostat);
 
+/*Draw Program Choose Frame*/
+void Draw_ProgramChooseFrame(const Thermostat_t* Thermostat);
+
 /*Draw Temperature Program Frame*/
 void Draw_TempProgramFrame(const Thermostat_t* Thermostat);
 
 /*Draw Time Program Frame*/
 void Draw_TimeProgramFrame(const Thermostat_t* Thermostat);
+
+/*Draw Program Mode*/
+void Draw_ProgramMode(const Thermostat_t* Thermostat);
 
 /*Draw Program Temperature*/
 void Draw_ProgramTemp(const Thermostat_t* Thermostat);

@@ -6,6 +6,9 @@
  */ 
 
 #include <avr/io.h>
+
+#include "Bit.h"
+
 #include "Regulator.h"
 
 /*--------------------Constants--------------------*/

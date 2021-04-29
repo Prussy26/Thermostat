@@ -33,11 +33,14 @@ int main(void)
 		.Mode = On
 		};
 		
+	Program_t Program[2] = { 0 };
+			
 	uint8_t Time[RTC_SIZE_FULL_TIME] = { 0 };
 		
 	ThermostatParameters_t Parameters = {
 		.Thermistor = Thermistor,
 		.Regulator = Regulator,
+		.Program = *Program,
 		.Brightness = 100
 	};
 	
@@ -47,7 +50,7 @@ int main(void)
 		.Time_i = 0,
 		.State = Default_State,
 		.Time = Time,
-		.Parameters =  &Parameters
+		.Parameters = &Parameters
 		};
 				
 	Thermostat_t *Thermostat_p = &Thermostat;

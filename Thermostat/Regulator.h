@@ -9,9 +9,6 @@
  
 /*--------------------PinOut--------------------*/
 
-#define DDR(PORT) (*(&PORT - 1))
-#define PIN(PORT) (*(&PORT - 2))
-
 #define REGULATOR_PORT PORTC
 #define REGULATOR_COOL_PIN PINC2
 #define REGULATOR_HEAT_PIN PINC3
@@ -22,13 +19,13 @@
 
 typedef enum Regulator_State_t { Idle , Cooling , Heating } Regulator_State_t;
 
-typedef enum Mode_t{ On = 0 , Cooling_Only , Heating_Only , Off , Error = -1 } Mode_t;
+enum Regulator_Mode_t { On = 0 , Cooling_Only , Heating_Only , Off , Error = -1 };
 
 typedef struct Regulator_t
 {
 	uint16_t Temperature;	// Regulation desired temperature in (10 x °C)
 	uint8_t Hysteresis;	// Hysteresis of relay regulation
-	Mode_t Mode;
+	uint8_t Mode;
 } Regulator_t;
 
 //extern Regulator_t Regulator;

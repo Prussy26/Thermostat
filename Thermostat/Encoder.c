@@ -191,13 +191,13 @@ void Rotate(void)
 
 		if (Result == ENCODER_DIR_CW)
 		{
-			SET_BIT(Encoder.ENCSR,ENCRS); // Right Shift
+			SET_BIT(Encoder.ENCSR,ENCRS); // Clock Wise
 		} 
 		else if (Result == ENCODER_DIR_CCW) 
 		{
-			SET_BIT(Encoder.ENCSR,ENCLS); // Left Shift
+			SET_BIT(Encoder.ENCSR,ENCLS); // Counter Clock Wise
 		}
-		Encoder.PrevTime = millis();
+		Encoder.PrevTime = millis(); // Timeout time update
 }
 
 // Interrupts --------------------------------------------------
