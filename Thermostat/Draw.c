@@ -277,8 +277,8 @@ void Draw_ProgramMenu(const Thermostat_t *Thermostat)
 	fprintf(&LCD_Stream, "%s", ProgramMenu_Text[Thermostat->SubMenu_i]);
 	if(Thermostat->SubMenu_i == ProgramMode_Set)
 	{
-		LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1 + LCD_ROW1_END - 6);
-		fprintf(&LCD_Stream, "%s", Thermostat->Parameters->Program_Mode ? "Auto  " : "Manual");
+		LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1 + 5);
+		fprintf(&LCD_Stream, "     %s", Thermostat->Parameters->Program_Mode ? "Auto  " : "Manual");
 	}
 
 	LCD_SetPosition(DRAW_MENU2 - 1);
@@ -287,8 +287,8 @@ void Draw_ProgramMenu(const Thermostat_t *Thermostat)
 	fprintf(&LCD_Stream, "%s", ProgramMenu_Text[Thermostat->SubMenu_i + 1]);
 	if(Thermostat->SubMenu_i + 1 == ProgramMode_Set)
 	{
-		LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1 + LCD_ROW1_END - 6);
-		fprintf(&LCD_Stream, "%s", Thermostat->Parameters->Program_Mode ? "Auto  " : "Manual");
+		LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1 + 5);
+		fprintf(&LCD_Stream, "     %s", Thermostat->Parameters->Program_Mode ? "Auto  " : "Manual");
 	}
 	else if(Thermostat->SubMenu_i + 1 == Program_Size)
 	{
@@ -323,7 +323,7 @@ void Draw_ProgramMode(const Thermostat_t* Thermostat)
 {
 	LCD_GoTo(LCD_PAGE1);
 	
-	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1 + LCD_ROW1_END - 6);
+	LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1 + LCD_ROW1_END - 5);
 	
 	if(Thermostat->Parameters->Program_Mode == Auto)
 	{
