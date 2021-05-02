@@ -68,7 +68,11 @@ void Regulator_Init(void)
 /*Set Regulator to desired state according to input temperature*/
 Regulator_State_t Regulator_Regulate(const Regulator_t *Regulator, const uint16_t temperature)
 {
-	if(Regulator->Mode != Off) // Regulate only if regulation is turned on
+	if(Regulator->Mode == Off) // Regulate only if regulation is turned on
+	{
+		Regulator_Idle();
+	}
+	else
 	{
 		switch(Regulator_State)
 		{

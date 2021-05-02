@@ -33,12 +33,11 @@ extern uint8_t PTR; // Periodic Tasks Register : Every Minute, Hourly, Daily, We
 
 typedef struct Program_t
 {
-	uint8_t Mode;
 	uint16_t Temp[2]; // Temp High , Temp Low
 	uint8_t Time[4];  // Start Hours, Start Minutes, Stop Hours, Stop Minutes
 } Program_t;
 
-enum {Auto , Manual};
+enum {Manual , Auto};
 
 enum {Hour_Program , Minute_Program};
 	
@@ -51,11 +50,11 @@ typedef struct ThermostatParameters_t
 	Thermistor_t Thermistor;	// Thermistor parameters
 	Regulator_t Regulator;		// Regulator parameters
 	uint8_t Brightness;			// Brightness of LCD
+	uint8_t Program_Mode;		// Manual or Auto regulation mode
 	Program_t Program[2];		// WorkDays + Weekend Program
 } ThermostatParameters_t;
 
-enum {WorkDays , Weekend , Program_Size};
-	
+enum { WorkDays , Weekend , ProgramMode_Set , Program_Size};
 
 typedef struct Thermostat_t
 {
@@ -63,14 +62,14 @@ typedef struct Thermostat_t
 	uint8_t State;						// State of Thermostat
 	uint8_t Time_i;						// Time index
 	uint8_t Menu_i;						// Menu index
-	uint8_t Program_i;					// Program index WorkDays/Weekend
-	uint8_t ProgramSet_i;				// Program index Temperature Set
+	uint8_t SubMenu_i;					// SubMenu index
+	uint8_t Set_i;						// Set index
 	uint8_t *Time;						// Actual time
 	ThermostatParameters_t *Parameters; // Parameters that needs to be saved to EEPROM						
 } Thermostat_t;
 
 enum Menu_t { Time_Set = 0 , Temperature_Set , Program_Set , Mode_Set , Hysteresis_Set , Brightness_Set , Menu_Size};
-enum State_t { Default_State , TempSet_State , Menu_State , ModeSet_State, TimeSet_State , ThermistorOffSet_State , ProgramChoose_State , ProgramSet_State , ProgramTempSet_State , ProgramTimeSet_State , HysteresisSet_State, BrightnessSet_State ,  Error_State};
+enum State_t { Default_State , TempSet_State , Menu_State , ModeSet_State, TimeSet_State , ThermistorOffSet_State , ProgramMenu_State , ProgramModeSet_State , ProgramTempSet_State , ProgramTimeSet_State , HysteresisSet_State, BrightnessSet_State ,  Error_State};
 	
 	
 /*--------------------Macros--------------------*/
@@ -121,14 +120,14 @@ void To_ThermistorOffSetState(Thermostat_t *Thermostat);
 void ThermistorOffSetState(Thermostat_t *Thermostat);
 
 
-void To_ProgramChooseState(Thermostat_t *Thermostat);
+void To_ProgramMenuState(Thermostat_t *Thermostat);
 
-void ProgramChooseState(Thermostat_t *Thermostat);
+void ProgramMenuState(Thermostat_t *Thermostat);
 
 
-void To_ProgramSetState(Thermostat_t *Thermostat);
+void To_ProgramModeSetState(Thermostat_t *Thermostat);
 
-void ProgramSetState(Thermostat_t *Thermostat);
+void ProgramModeSetState(Thermostat_t *Thermostat);
 
 
 void To_ProgramTempSetState(Thermostat_t *Thermostat);
@@ -139,6 +138,11 @@ void ProgramTempSetState(Thermostat_t *Thermostat);
 void To_ProgramTimeSetState(Thermostat_t *Thermostat);
 
 void ProgramTimeSetState(Thermostat_t *Thermostat);
+
+
+void To_ModeSetState(Thermostat_t *Thermostat);
+
+void ModeSetState(Thermostat_t *Thermostat);
 
 
 void To_HysteresisSetState(Thermostat_t *Thermostat);

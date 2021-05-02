@@ -83,6 +83,9 @@ void Draw_Time(const Thermostat_t *Thermostat);
 /*Draw Menu*/
 void Draw_Menu(const Thermostat_t *Thermostat);
 
+/*Draw Program Menu*/
+void Draw_ProgramMenu(const Thermostat_t *Thermostat);
+
 /*Draw Program Choose Frame*/
 void Draw_ProgramChooseFrame(const Thermostat_t* Thermostat);
 
@@ -100,6 +103,9 @@ void Draw_ProgramTemp(const Thermostat_t* Thermostat);
 
 /*Draw Program Time*/
 void Draw_ProgramTime(const Thermostat_t* Thermostat);
+
+/*Draw Regulation Mode*/
+void Draw_Mode(const Thermostat_t* Thermostat);
 
 /*Draw Hysteresis Value*/
 void Draw_Hysteresis(const uint8_t hysteresis);
