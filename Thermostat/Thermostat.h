@@ -28,6 +28,20 @@ extern uint8_t PTR; // Periodic Tasks Register : Every Minute, Hourly, Daily, We
 #define PTRMONTH	6	// Monthly Flag
 #define PTRYEAR		7	// Yearly Flag
 
+/*---------------------Constants-------------------*/
+/*EEPROM Size of parameter in bytes*/
+#define MEMSIZE_THERMISTOR	4
+#define MEMSIZE_REGULATOR	4
+#define MEMSIZE_PROGRAM		17
+#define MEMSIZE_BRIGHTNESS	1
+#define MEMSIZE_PARAMETERS	MEMSIZE_THERMISTOR + MEMSIZE_REGULATOR + MEMSIZE_PROGRAM + MEMSIZE_BRIGHTNESS
+
+/*EEPROM Address position*/
+#define MEMPOS_START		0
+#define MEMPOS_THERMISTOR	0
+#define MEMPOS_REGULATOR	(MEMPOS_THERMISTOR + MEMSIZE_THERMISTOR)
+#define MEMPOS_PROGRAM		(MEMPOS_REGULATOR + MEMSIZE_REGULATOR)
+#define MEMPOS_BRIGHTNESS	(MEMPOS_PROGRAM + MEMSIZE_PROGRAM)
 
 /*--------------------Variables--------------------*/
 
@@ -49,9 +63,9 @@ typedef struct ThermostatParameters_t
 {
 	Thermistor_t Thermistor;	// Thermistor parameters
 	Regulator_t Regulator;		// Regulator parameters
-	uint8_t Brightness;			// Brightness of LCD
 	uint8_t Program_Mode;		// Manual or Auto regulation mode
 	Program_t Program[2];		// WorkDays + Weekend Program
+	uint8_t Brightness;			// Brightness of LCD
 } ThermostatParameters_t;
 
 enum { WorkDays , Weekend , ProgramMode_Set , Program_Size};
@@ -91,6 +105,22 @@ void Program(Thermostat_t *Thermostat);
 
 /*Sets program for next day at midnight*/
 void ProgramDailyCheck(Thermostat_t *Thermostat);
+
+/*Save Thermistor Parameters to EEPROM*/
+void Save_Thermistor(const Thermostat_t *Thermostat);
+
+/*Save Regulator Parameters to EEPROM*/
+void Save_Regulator(const Thermostat_t *Thermostat);
+
+/*Save Regulator Parameters to EEPROM*/
+void Save_Program(const Thermostat_t *Thermostat);
+
+/*Save Brightness to EEPROM*/
+void Save_Brightness(const Thermostat_t *Thermostat);
+
+/*Load all Parameters from EEPROM*/
+void Load_Parameters(Thermostat_t *Thermostat);
+
 
 void To_DefaultState(Thermostat_t *Thermostat);
 

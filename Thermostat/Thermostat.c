@@ -12,6 +12,7 @@
 #include "Thermostat.h"
 #include "Regulator.h"
 #include "Encoder.h"
+#include "EEPROM.h"
 #include "LCD.h"
 #include "Draw.h"
 
@@ -33,6 +34,10 @@ uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN 
 	 RTC_SetSQ(RTC_SQ_1Hz);
 	 
 	 //PRR = (1<<PRSPI);
+	 
+	 Load_Parameters(Thermostat);
+	 
+	 LCD_SetBrightness(Thermostat->Parameters->Brightness);
 	 
 	 Draw_Frame(Thermostat);
  }
@@ -256,6 +261,148 @@ void ProgramDailyCheck(Thermostat_t *Thermostat)
 }
 
 
+/*Save Thermistor Parameters to EEPROM*/
+void Save_Thermistor(const Thermostat_t *Thermostat)
+{
+	if(Thermostat->Parameters->Thermistor.Offset > 300)
+	{
+		Thermostat->Parameters->Thermistor.Offset = 0;
+	}
+	
+	EEPROM_Write(MEMPOS_THERMISTOR, (uint8_t *)&Thermostat->Parameters->Thermistor , MEMSIZE_THERMISTOR);
+}
+
+/*Save Regulator Parameters to EEPROM*/
+void Save_Regulator(const Thermostat_t *Thermostat)
+{
+	if(Thermostat->Parameters->Regulator.Mode > Off)
+	{
+		Thermostat->Parameters->Regulator.Mode = On;
+	}
+	
+	if(Thermostat->Parameters->Regulator.Hysteresis > 100)
+	{
+		Thermostat->Parameters->Regulator.Hysteresis = 4;
+	}
+	
+	if((Thermostat->Parameters->Regulator.Temperature < 100) || (Thermostat->Parameters->Regulator.Temperature > 300))
+	{
+		Thermostat->Parameters->Regulator.Temperature = 220;
+	}
+	
+	EEPROM_Write(MEMPOS_REGULATOR, (uint8_t *)&Thermostat->Parameters->Regulator , MEMSIZE_REGULATOR);
+}
+
+/*Save Program Parameters to EEPROM*/
+void Save_Program(const Thermostat_t *Thermostat)
+{
+	if(Thermostat->Parameters->Program_Mode > Auto)
+	{
+		Thermostat->Parameters->Program_Mode = Auto;
+	}
+	
+	for (uint8_t PartOfWeek = WorkDays ; PartOfWeek <= Weekend ; PartOfWeek++)
+	{
+		for (uint8_t temp = Temp_H_Program ; temp <= Temp_L_Program ; temp++)
+		{
+			if((Thermostat->Parameters->Program[PartOfWeek].Temp[temp] < 100) || (Thermostat->Parameters->Program[PartOfWeek].Temp[temp] > 300))
+			{
+				Thermostat->Parameters->Program[PartOfWeek].Temp[temp] = 220;
+			}
+		}
+		for (uint8_t tim = Time_Start_Hour_Program ; tim <=  Time_Stop_Hour_Program  ; tim += 2)
+		{
+			if(Thermostat->Parameters->Program[PartOfWeek].Time[tim] > 24)
+			{
+				Thermostat->Parameters->Program[PartOfWeek].Time[tim] = 0;
+			}
+		}
+		for (uint8_t tim = Time_Start_Min_Program ; tim <=  Time_Stop_Min_Program  ; tim += 2)
+		{
+			if(Thermostat->Parameters->Program[PartOfWeek].Time[tim] >= 60)
+			{
+				Thermostat->Parameters->Program[PartOfWeek].Time[tim] = 0;
+			}
+		}
+	}
+	
+	EEPROM_Write(MEMPOS_PROGRAM, (uint8_t *)&Thermostat->Parameters->Program_Mode , MEMSIZE_PROGRAM);
+}
+
+/*Save Brightness to EEPROM*/
+void Save_Brightness(const Thermostat_t *Thermostat)
+{
+	if(Thermostat->Parameters->Brightness > 100)
+	{
+		Thermostat->Parameters->Brightness = 100;
+	}
+	
+	EEPROM_Write(MEMPOS_BRIGHTNESS, &Thermostat->Parameters->Brightness , MEMSIZE_BRIGHTNESS);
+}
+
+/*Load all Parameters from EEPROM*/
+void Load_Parameters(Thermostat_t *Thermostat)
+{
+	EEPROM_Read(MEMPOS_START, (uint8_t *)Thermostat->Parameters , MEMSIZE_PARAMETERS);
+	
+	/* Check all loaded parameters*/
+	if(Thermostat->Parameters->Thermistor.Offset > 300)
+	{
+		Thermostat->Parameters->Thermistor.Offset = 0;
+	}
+	
+	if(Thermostat->Parameters->Regulator.Mode > Off)
+	{
+		Thermostat->Parameters->Regulator.Mode = On;
+	}
+	
+	if(Thermostat->Parameters->Regulator.Hysteresis > 100)
+	{
+		Thermostat->Parameters->Regulator.Hysteresis = 4;
+	}
+	
+	if((Thermostat->Parameters->Regulator.Temperature < 100) || (Thermostat->Parameters->Regulator.Temperature > 300))
+	{
+		Thermostat->Parameters->Regulator.Temperature = 220;
+	}
+	
+	if(Thermostat->Parameters->Program_Mode > Auto)
+	{
+		Thermostat->Parameters->Program_Mode = Auto;
+	}
+	
+	for (uint8_t PartOfWeek = WorkDays ; PartOfWeek <= Weekend ; PartOfWeek++)
+	{
+		for (uint8_t temp = Temp_H_Program ; temp <= Temp_L_Program ; temp++)
+		{
+			if((Thermostat->Parameters->Program[PartOfWeek].Temp[temp] < 100) || (Thermostat->Parameters->Program[PartOfWeek].Temp[temp] > 300))
+			{
+				Thermostat->Parameters->Program[PartOfWeek].Temp[temp] = 220;
+			}
+		}
+		for (uint8_t tim = Time_Start_Hour_Program ; tim <=  Time_Stop_Hour_Program  ; tim += 2)
+		{
+			if(Thermostat->Parameters->Program[PartOfWeek].Time[tim] > 24)
+			{
+				Thermostat->Parameters->Program[PartOfWeek].Time[tim] = 0;
+			}
+		}
+		for (uint8_t tim = Time_Start_Min_Program ; tim <=  Time_Stop_Min_Program  ; tim += 2)
+		{
+			if(Thermostat->Parameters->Program[PartOfWeek].Time[tim] >= 60)
+			{
+				Thermostat->Parameters->Program[PartOfWeek].Time[tim] = 0;
+			}
+		}
+	}	
+	
+	if(Thermostat->Parameters->Brightness > 100)
+	{
+		Thermostat->Parameters->Brightness = 100;
+	}
+}
+
+
 /*Thermostat States*/
 
 
@@ -302,12 +449,13 @@ void TempSetState(Thermostat_t *Thermostat)
 	switch(Encoder_Get())
 	{
 		case Short_Press:
-		
-		To_DefaultState(Thermostat);
+			Save_Regulator(Thermostat);
+			To_DefaultState(Thermostat);
 		break;
 		
 		case Long_Press:
-		To_TimeSetState(Thermostat);
+			Save_Regulator(Thermostat);
+			To_TimeSetState(Thermostat);
 		break;
 		
 		case Shift_Left:
@@ -329,7 +477,8 @@ void TempSetState(Thermostat_t *Thermostat)
 		break;
 		
 		case Timeout:
-		To_DefaultState(Thermostat);
+			Save_Regulator(Thermostat);
+			To_DefaultState(Thermostat);
 		break;
 	}
 }
@@ -500,7 +649,7 @@ void ThermistorOffSetState(Thermostat_t *Thermostat)
 		//break;
 		  
 		case Shift_Left:
-			if (Thermostat->Temperature > 0) // Min. 0.0 °C
+			if (Thermostat->Temperature > 100) // Min. 10.0 °C
 			{
 				Thermostat->Temperature--;
 				Draw_Temp(Thermostat->Temperature);
@@ -509,7 +658,7 @@ void ThermistorOffSetState(Thermostat_t *Thermostat)
 		break;
 		  
 		case Shift_Right:
-			if (Thermostat->Temperature < 500) // Max. 50.0 °C
+			if (Thermostat->Temperature < 300) // Max. 30.0 °C
 			{
 				Thermostat->Temperature++;
 				Draw_Temp(Thermostat->Temperature);
@@ -522,6 +671,7 @@ void ThermistorOffSetState(Thermostat_t *Thermostat)
 		
 		default: // Short Press, Long Press, Timeout are same
 			Thermostat->Parameters->Thermistor.Offset = Thermostat->Temperature - Thermistor_GetTemperatureX10(&Thermostat->Parameters->Thermistor ,ADCP1) + Thermostat->Parameters->Thermistor.Offset;
+			Save_Thermistor(Thermostat);
 			To_DefaultState(Thermostat);
 		break;
 		}
@@ -600,12 +750,12 @@ void ProgramModeSetState(Thermostat_t *Thermostat)
 	switch(Encoder_Get())
 	{
 		case Short_Press:
-			//Save_Program(Thermostat);
+			Save_Program(Thermostat);
 			To_ProgramMenuState(Thermostat);	
 		break;
 		
 		case Long_Press:
-			//Save_Program(Thermostat);
+			Save_Program(Thermostat);
 			To_ProgramMenuState(Thermostat);
 		break;
 		
@@ -628,7 +778,7 @@ void ProgramModeSetState(Thermostat_t *Thermostat)
 		break;
 		
 		case Timeout:
-			//Save_Program(Thermostat);
+			Save_Program(Thermostat);
 			To_DefaultState(Thermostat);
 		break;
 	}
@@ -669,7 +819,7 @@ void ProgramTempSetState(Thermostat_t *Thermostat)
 		break;
 		
 		case Long_Press:
-			//Save_Program(Thermostat);
+			Save_Program(Thermostat);
 			To_ProgramMenuState(Thermostat);
 		break;
 		
@@ -693,7 +843,7 @@ void ProgramTempSetState(Thermostat_t *Thermostat)
 		break;
 		
 		case Timeout:
-			//Save_Program(Thermostat);
+			Save_Program(Thermostat);
 			To_DefaultState(Thermostat);
 		break;
 	}
@@ -722,13 +872,13 @@ void ProgramTimeSetState(Thermostat_t *Thermostat)
 			}
 			else
 			{
-				//Save_Program(Thermostat);
+				Save_Program(Thermostat);
 				To_ProgramMenuState(Thermostat);
 			}
 		break;
 		
 		case Long_Press:
-			//Save_Program(Thermostat);
+			Save_Program(Thermostat);
 			To_MenuState(Thermostat);
 		break;
 		
@@ -749,7 +899,7 @@ void ProgramTimeSetState(Thermostat_t *Thermostat)
 		break;
 		
 		case Timeout:
-			//Save_Program(Thermostat);
+			Save_Program(Thermostat);
 			To_DefaultState(Thermostat);
 		break;
 	}
@@ -775,12 +925,12 @@ void ModeSetState(Thermostat_t *Thermostat)
 	switch(Encoder_Get())
 	{
 		case Short_Press:
-			//Save_Mode(Thermostat);
+			Save_Regulator(Thermostat);
 			To_MenuState(Thermostat);
 		break;
 		
 		case Long_Press:
-			//Save_Mode(Thermostat);
+			Save_Regulator(Thermostat);
 			To_MenuState(Thermostat);
 		break;
 		
@@ -801,7 +951,7 @@ void ModeSetState(Thermostat_t *Thermostat)
 		break;
 		
 		case Timeout:
-			//Save_Program(Thermostat);
+			Save_Regulator(Thermostat);
 			To_DefaultState(Thermostat);
 		break;
 	}
@@ -819,40 +969,43 @@ void To_HysteresisSetState(Thermostat_t *Thermostat)
 }
   
 void HysteresisSetState(Thermostat_t *Thermostat)
-  {
-	  switch(Encoder_Get())
-	  {
-		  case Short_Press:
+{
+	switch(Encoder_Get())
+	{
+		case Short_Press:
+			Save_Regulator(Thermostat);
 			To_MenuState(Thermostat);
-		  break;
+		break;
 		  
-		  case Long_Press:
+		case Long_Press:
+			Save_Regulator(Thermostat);
 			To_DefaultState(Thermostat);
-		  break;
+		break;
 		  
-		  case Shift_Left:
-			  if (Thermostat->Parameters->Regulator.Hysteresis > 1) // Min 0.1 °C
-			  {
-				  Thermostat->Parameters->Regulator.Hysteresis--;
-				  Draw_Hysteresis(Thermostat->Parameters->Regulator.Hysteresis);
-				  LCD_SetPosition(DRAW_HYSTERESIS + 3);
-			  }
-		  break;
+		case Shift_Left:
+			if (Thermostat->Parameters->Regulator.Hysteresis > 1) // Min 0.1 °C
+			{
+				Thermostat->Parameters->Regulator.Hysteresis--;
+				Draw_Hysteresis(Thermostat->Parameters->Regulator.Hysteresis);
+				LCD_SetPosition(DRAW_HYSTERESIS + 3);
+			}
+		break;
 		  
-		  case Shift_Right:
-			  if (Thermostat->Parameters->Regulator.Hysteresis < 100) // Max 10 °C
-			  {
-				  Thermostat->Parameters->Regulator.Hysteresis++;
-				  Draw_Hysteresis(Thermostat->Parameters->Regulator.Hysteresis);
-				  LCD_SetPosition(DRAW_HYSTERESIS + 3);
-			  }
-		  break;
+		case Shift_Right:
+			if (Thermostat->Parameters->Regulator.Hysteresis < 100) // Max 10 °C
+			{
+				Thermostat->Parameters->Regulator.Hysteresis++;
+				Draw_Hysteresis(Thermostat->Parameters->Regulator.Hysteresis);
+				LCD_SetPosition(DRAW_HYSTERESIS + 3);
+			}
+		break;
 		  
-		  case Timeout:
+		case Timeout:
+			Save_Regulator(Thermostat);
 			To_DefaultState(Thermostat);
-		  break;
-	  }
-  }
+		break;
+	}
+}
 
 
  void To_BrightnessSetState(Thermostat_t *Thermostat)
@@ -865,44 +1018,46 @@ void HysteresisSetState(Thermostat_t *Thermostat)
 	 Thermostat->State = BrightnessSet_State;
  }
 
- void BrightnessSetState(Thermostat_t *Thermostat)
- {
-	 switch(Encoder_Get())
-	 {
-		 case Short_Press:
-		 To_MenuState(Thermostat);
-		 break;
+void BrightnessSetState(Thermostat_t *Thermostat)
+{
+	switch(Encoder_Get())
+	{
+		case Short_Press:
+			Save_Brightness(Thermostat);
+			To_MenuState(Thermostat);
+		break;
 		 
-		 case Long_Press:
+		case Long_Press:
+			Save_Brightness(Thermostat);
+			To_DefaultState(Thermostat);
+		break;
 		 
-		 To_DefaultState(Thermostat);
-		 break;
+		case Shift_Left:
+		if (Thermostat->Parameters->Brightness >= 10)
+			{
+				Thermostat->Parameters->Brightness -= 10;
+				LCD_SetBrightness(Thermostat->Parameters->Brightness);
+				Draw_Brightness(Thermostat->Parameters->Brightness);
+				LCD_SetPosition(DRAW_BRIGHTNESS + 2);
+			}
+		break;
 		 
-		 case Shift_Left:
-		 if (Thermostat->Parameters->Brightness >= 10)
-		 {
-			 Thermostat->Parameters->Brightness -= 10;
-			 LCD_SetBrightness(Thermostat->Parameters->Brightness);
-			 Draw_Brightness(Thermostat->Parameters->Brightness);
-			 LCD_SetPosition(DRAW_BRIGHTNESS + 2);
-		 }
-		 break;
+		case Shift_Right:
+			if (Thermostat->Parameters->Brightness <= 90) // Max 100%
+			{
+				Thermostat->Parameters->Brightness += 10;
+				LCD_SetBrightness(Thermostat->Parameters->Brightness);
+				Draw_Brightness(Thermostat->Parameters->Brightness);
+				LCD_SetPosition(DRAW_BRIGHTNESS + 2);
+			}
+		break;
 		 
-		 case Shift_Right:
-		 if (Thermostat->Parameters->Brightness <= 90) // Max 100%
-		 {
-			 Thermostat->Parameters->Brightness += 10;
-			 LCD_SetBrightness(Thermostat->Parameters->Brightness);
-			 Draw_Brightness(Thermostat->Parameters->Brightness);
-			 LCD_SetPosition(DRAW_BRIGHTNESS + 2);
-		 }
-		 break;
-		 
-		 case Timeout:
-		 To_DefaultState(Thermostat);
-		 break;
-	 }
- }
+		case Timeout:
+			Save_Brightness(Thermostat);
+			To_DefaultState(Thermostat);
+		break;
+	}
+}
 
 
  

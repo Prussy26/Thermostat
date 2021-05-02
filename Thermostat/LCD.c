@@ -70,7 +70,7 @@ void LCD_SendData(const uint8_t data)
 /*Initializing LCD Display*/
 void LCD_Init(void)
 {	
-	//timerInit();
+	timer_Init();
 	ADC_Init(AVCC);
 	/*Setting Data Direction Registers*/
 	LCD_DDR_RS |= (1<<LCD_RS); 
@@ -183,7 +183,7 @@ void LCD_BrightnessInit(uint8_t brightness)
 		OCR1B = ((uint16_t)brightness*255)/100;
 		
 		TCCR1B |= (1<<CS10);
-		//sei();
+		sei();
 	}
 }
 

@@ -8,11 +8,13 @@
 #include <avr/io.h>
 
 #include "I2C.h"
+#include "timer.h"
 #include "EEPROM.h"
 
 void EEPROM_Init(void)
 {	
 	I2C_Init(I2C_FREQ_100K);
+	timer_Init();
 }
 
 
@@ -24,6 +26,7 @@ void EEPROM_Write(const uint16_t address, const uint8_t *data, const uint8_t siz
 	uint8_t MemoryAddress[2] = {address & 0xFF00, address & 0x00FF};
 	I2C_TransmitData(EEPROM_ADDRESS, MemoryAddress, 2, I2C_REPEATSTART);
 	I2C_TransmitData(I2C_ONLYDATA, data, size, I2C_NOREPEATSTART);	
+	delay_ms(5);
 }
 
 /*Read Data to EEPROM Address*/

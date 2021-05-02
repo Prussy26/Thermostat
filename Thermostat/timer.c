@@ -17,7 +17,7 @@ volatile uint32_t timer0_ms = 0;
 
 // Timer0 ----------------------------------------------------------
 
-void millis_Init(void)
+void timer_Init(void)
 {	
 	TCCR0A |= (2<<WGM00);	// Setting Timer0 to CTC Mode
 	TCNT0 = 0;
@@ -97,9 +97,14 @@ ISR(TIMER0_COMPA_vect) // Counter overflow interrupt
 
 void delay_us(uint32_t us) // Busy wait using timer
 {
-	//timer1overflowCount = 0;		// Reseting overflowCouter
 	uint32_t t0 = micros();		// Get initial time
 	while ((us + t0) >= micros()); // Busy wait
+}
+
+void delay_ms(uint32_t ms) // Busy wait using timer
+{
+	uint32_t t0 = millis();		// Get initial time
+	while ((ms + t0) >= millis()); // Busy wait
 }
 
 

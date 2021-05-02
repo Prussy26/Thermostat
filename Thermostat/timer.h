@@ -9,7 +9,7 @@
 
 // Timer0 ----------------------------------------------------------
 	
-void millis_Init(void);	// Initialization of Timer0 for millis Function
+void timer_Init(void);	// Initialization of Timer0 for millis Function
 
 /*Return Time in ms*/
 uint32_t millis(void);
@@ -22,3 +22,5 @@ uint32_t millis(void);
 
 //void busyDelay_us(uint32_t us); // Busy wait
 void delay_us(uint32_t us); // Different busy wait :D
+
+void delay_ms(uint32_t ms); // Busy wait using timer

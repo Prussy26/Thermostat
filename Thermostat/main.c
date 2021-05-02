@@ -12,40 +12,29 @@
 #include "Bit.h"
 
 #include "Thermostat.h"
-//#include "Thermistor.h"
-//#include "Regulator.h"
-//#include "RTC.h"
-//#include "Encoder.h"
-//#include "LCD.h"
-//#include "Draw.h"
 
 int main(void)
 {
-	Thermistor_t Thermistor = {
-		.R0 = 10,
-		.B = 3895,
-		.Offset = 0
-		};
+	//Thermistor_t Thermistor = {
+		//.R0 = 10,
+		//.B = 3895,
+		//.Offset = 0
+		//};
+		//
+	//Regulator_t Regulator = { 
+		//.Temperature = 20,
+		//.Hysteresis = 4,
+		//.Mode = On
+		//};
 		
-	Regulator_t Regulator = { 
-		.Temperature = 20,
-		.Hysteresis = 4,
-		.Mode = On
-		};
-		
-	Program_t Program[2] = { 0 };
+	//Program_t Program[2] = { 0 };
 			
 	uint8_t Time[RTC_SIZE_FULL_TIME] = { 0 };
 		
-	ThermostatParameters_t Parameters = {
-		.Thermistor = Thermistor,
-		.Regulator = Regulator,
-		.Program = *Program,
-		.Brightness = 100
-	};
+	ThermostatParameters_t Parameters = {0};
 	
 	Thermostat_t Thermostat = { 
-		.Temperature = 20,
+		.Temperature = 200,
 		.Menu_i = 0,
 		.Time_i = 0,
 		.State = Default_State,
@@ -54,13 +43,6 @@ int main(void)
 		};
 				
 	Thermostat_t *Thermostat_p = &Thermostat;
-	//Thermostat_p->Parameters->Thermistor = &Thermistor;
-	//Thermostat_p->Parameters->Regulator = &Regulator;
-	//Thermostat_p->Time = Time;
-	//Thermostat_p->Time_i = 0;
-	//Thermostat_p->Menu_i = 0;
-	//Thermostat_p->State = Default_State;
-	//Thermostat_p->Parameters->Regulator->Temperature = 20;
 	
 	Initialization(Thermostat_p);
 		
