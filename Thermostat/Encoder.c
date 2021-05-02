@@ -18,8 +18,8 @@
 
 /*Defining de-bouncing Times*/
 #define DEBOUNC_TIME_ENCODER 5 // 5 ms
-#define DEBOUNC_TIME_BUTTON 20 // 10 ms
-#define LONG_PRESS_TIME 600 // 800 ms
+#define DEBOUNC_TIME_BUTTON 5 // 10 ms
+#define LONG_PRESS_TIME 500 // 500 ms
 #define TIMEOUT 10000 // 10 s
 
 /*Defining ENCSR Register Bits*/
@@ -136,7 +136,7 @@ void Encoder_Init(void)
 	SET_BIT(Encoder.ENCSR , ENCEN);
 	
 	/*Initializing millis for de-bouncing*/
-	millis_Init(); 
+	timer_Init(); 
 }
 
 uint8_t Encoder_Get(void)
@@ -144,10 +144,9 @@ uint8_t Encoder_Get(void)
 	if(GET_BIT(Encoder.ENCSR,ENCSP) != 0)
 	{
 		CLR_BIT(Encoder.ENCSR,ENCSP);
-		//CLR_BIT(Encoder.ENCSR,ENCPEN);
 		return Short_Press;
 	}
-	if(millis() >= (Encoder.PrevTime + LONG_PRESS_TIME) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
+	if((millis() >= (Encoder.PrevTime + LONG_PRESS_TIME)) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
 	{
 		CLR_BIT(Encoder.ENCSR,ENCPEN);
 		return Long_Press;
@@ -203,7 +202,6 @@ void Rotate(void)
 ISR(INT0_vect)
 {	
 	Rotate();
-
 }
 
 ISR(PCINT0_vect)
@@ -212,25 +210,22 @@ ISR(PCINT0_vect)
 }
 
 ISR(PCINT1_vect)
-{
-	
+{	
 	if(millis() >= (Encoder.PrevTime + DEBOUNC_TIME_BUTTON))
 	{	
 		cli();	 	
-		if((GET_BIT(Encoder.ENCSR,ENCPBS) == 0)) // Button is Pushed
+		if((GET_BIT(Encoder.ENCSR,ENCPBS) == 0) && (GET_BIT(Encoder.ENCSR,ENCPEN) == 0)) // Button is Pushed
 		{
 			SET_BIT(Encoder.ENCSR,ENCPEN);			// Enable Press Functionality
 		}
-		else// if((GET_BIT(Encoder.ENCSR,ENCPBS) != 0)) // Button is Released
+		/*If Released before Long Press then its Short Press*/
+		else if(millis() <= (Encoder.PrevTime + LONG_PRESS_TIME)) // && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0) && (GET_BIT(Encoder.ENCSR,ENCPBS) != 0))
 		{
-			/*If Released before Long Press then its Short Press*/
-			if((millis() <= (Encoder.PrevTime + LONG_PRESS_TIME)) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
-			{
-				SET_BIT(Encoder.ENCSR,ENCSP);  // Set Short Press Flag
-				CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
-			}			
+			SET_BIT(Encoder.ENCSR,ENCSP);  // Set Short Press Flag
+			CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
 		}
 		ReadButton(); 
+		if((GET_BIT(Encoder.ENCSR,ENCPBS) == 0)) CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
 		Encoder.PrevTime = millis();
 		sei();	
 	}	
