@@ -572,7 +572,7 @@ void To_TimeSetState(Thermostat_t *Thermostat)
  {
 	 LCD_GoTo(LCD_PAGE0);
 	 Thermostat->Time[Sec] = 0;
-	 Thermostat->Time_i = 0;
+	 Thermostat->Set_i = 0;
 	 LCD_SetPosition(DRAW_MIN + 1);
 	 LCD_CursorON();
 	 CLR_BIT(PTR,PTREN);
@@ -585,10 +585,10 @@ void TimeSetState(Thermostat_t *Thermostat)
 	 switch(Encoder_Get())
 	 {
 		 case Short_Press:
-		 if (Thermostat->Time_i < (Month - Min))
+		 if (Thermostat->Set_i < (Month - Min))
 		 {
-			 Thermostat->Time_i++;
-			 LCD_SetPosition(Time_Position[Thermostat->Time_i] + 1);
+			 Thermostat->Set_i++;
+			 LCD_SetPosition(Time_Position[Thermostat->Set_i] + 1);
 		 }
 		 else
 		 {
@@ -605,17 +605,17 @@ void TimeSetState(Thermostat_t *Thermostat)
 		 break;
 		 
 		 case Shift_Left:
-			 if (Thermostat->Time[Thermostat->Time_i + Min] > 0) // Min-Month
+			 if (Thermostat->Time[Thermostat->Set_i + Min] > 0) // Min-Month
 			 {
-				 Thermostat->Time[Thermostat->Time_i + Min]--;
+				 Thermostat->Time[Thermostat->Set_i + Min]--;
 				 Draw_Time(Thermostat);
 			 }
 		 break;
 		 
 		 case Shift_Right:
-			 if (Thermostat->Time[Thermostat->Time_i + Min] < Time_Max[Thermostat->Time_i + Min]) // Min-Month
+			 if (Thermostat->Time[Thermostat->Set_i + Min] < Time_Max[Thermostat->Set_i + Min]) // Min-Month
 			 {
-				 Thermostat->Time[Thermostat->Time_i + Min]++;
+				 Thermostat->Time[Thermostat->Set_i + Min]++;
 				 Draw_Time(Thermostat);
 			 }
 		 break;

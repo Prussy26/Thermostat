@@ -274,6 +274,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 				if((x >= 1) && (x <= 9999)) 
 				{
 					Thermostat->Parameters->Thermistor.B = x;
+					Thermostat->Parameters->Thermistor.Offset = 0;
 					Save_Thermistor(Thermostat);
 				}
 				else response = INCORRECT_FORMAT;
@@ -284,6 +285,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 				if((x >= 1) && (x <= 99)) 
 				{
 					Thermostat->Parameters->Thermistor.R0 = x;
+					Thermostat->Parameters->Thermistor.Offset = 0;
 					Save_Thermistor(Thermostat);
 				}
 				else response = INCORRECT_FORMAT;

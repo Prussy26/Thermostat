@@ -74,11 +74,10 @@ typedef struct Thermostat_t
 {
 	uint16_t Temperature;				// ActualTemperature
 	uint8_t State;						// State of Thermostat
-	uint8_t Time_i;						// Time index
 	uint8_t Menu_i;						// Menu index
 	uint8_t SubMenu_i;					// SubMenu index
 	uint8_t Set_i;						// Set index
-	uint8_t *Time;						// Actual time
+	uint8_t *Time;					// Actual time
 	ThermostatParameters_t *Parameters; // Parameters that needs to be saved to EEPROM						
 } Thermostat_t;
 

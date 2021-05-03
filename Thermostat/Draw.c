@@ -169,10 +169,10 @@ void Draw_Icon(uint8_t icon)
 }
 
 
-/*Draw Time according to Time_i*/
+/*Draw Time according to Set_i*/
 void Draw_Time(const Thermostat_t *Thermostat)
 {
-	switch (Thermostat->Time_i + 1)
+	switch (Thermostat->Set_i + 1)
 	{
 		case Min:
 			Draw_Minutes(Thermostat->Time);

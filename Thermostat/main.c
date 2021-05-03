@@ -37,9 +37,10 @@ int main(void)
 	
 	Thermostat_t Thermostat = { 
 		.Temperature = 200,
-		.Menu_i = 0,
-		.Time_i = 0,
 		.State = Default_State,
+		.Menu_i = 0,
+		.SubMenu_i = 0,
+		.Set_i = 0,		
 		.Time = Time,
 		.Parameters = &Parameters
 		};
