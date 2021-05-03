@@ -77,6 +77,7 @@ uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN 
 		if(GET_BIT(PTR,PTRSEC) != 0)
 		{
 			Thermostat->Temperature  = Thermistor_GetTemperatureX10(&Thermostat->Parameters->Thermistor ,ADCP1);
+			if(Thermostat->Temperature < 0) Thermostat->Temperature = 0;
 			Draw_Icon(Regulator_Regulate(&Thermostat->Parameters->Regulator, Thermostat->Temperature));			 
 			Draw_Temp(Thermostat->Temperature);
 			 
@@ -129,7 +130,7 @@ uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN 
 			//Draw_Year(Thermostat->Time);
 			CLR_BIT(PTR,PTRYEAR); // Task Done
 		}
-		 
+ 
 	}
  }
 
