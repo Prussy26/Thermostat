@@ -19,7 +19,7 @@
 
 typedef enum Regulator_State_t { Idle , Cooling , Heating } Regulator_State_t;
 
-enum Regulator_Mode_t { On = 0 , Heating_Only , Cooling_Only , Off , Mode_Size , Error = -1 };
+enum Regulator_Mode_t { Off = 0 , On , Heating_Only , Cooling_Only , Mode_Size , Error = -1 };
 
 typedef struct Regulator_t
 {

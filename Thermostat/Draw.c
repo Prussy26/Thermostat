@@ -50,10 +50,11 @@ char ProgramMenu_Text[Program_Size][LCD_COLS] = {
 };
 
 char Mode_Text[Mode_Size][10] = {
+	"      Off\0",
 	"       On\0",
 	"Heat only\0",
-	"Cool only\0",
-	"      Off\0"
+	"Cool only\0"
+	
 };
 
 
@@ -278,7 +279,7 @@ void Draw_ProgramMenu(const Thermostat_t *Thermostat)
 	if(Thermostat->SubMenu_i == ProgramMode_Set)
 	{
 		LCD_SetPositionXY(LCD_ROW1, LCD_PAGE1 + 5);
-		fprintf(&LCD_Stream, "     %s", Thermostat->Parameters->Program_Mode ? "Auto  " : "Manual");
+		fprintf(&LCD_Stream, "     %s", Thermostat->Parameters->Program_Mode ? "  Auto" : "Manual");
 	}
 
 	LCD_SetPosition(DRAW_MENU2 - 1);
@@ -288,7 +289,7 @@ void Draw_ProgramMenu(const Thermostat_t *Thermostat)
 	if(Thermostat->SubMenu_i + 1 == ProgramMode_Set)
 	{
 		LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1 + 5);
-		fprintf(&LCD_Stream, "     %s", Thermostat->Parameters->Program_Mode ? "Auto  " : "Manual");
+		fprintf(&LCD_Stream, "     %s", Thermostat->Parameters->Program_Mode ? "  Auto" : "Manual");
 	}
 	else if(Thermostat->SubMenu_i + 1 == Program_Size)
 	{
@@ -327,7 +328,7 @@ void Draw_ProgramMode(const Thermostat_t* Thermostat)
 	
 	if(Thermostat->Parameters->Program_Mode == Auto)
 	{
-		fprintf(&LCD_Stream, "Auto  ");
+		fprintf(&LCD_Stream, "  Auto");
 	}
 	else if(Thermostat->Parameters->Program_Mode == Manual)
 	{
@@ -375,7 +376,7 @@ void Draw_TimeProgramFrame(const Thermostat_t* Thermostat)
 	LCD_ClearSpace(DRAW_TEMP_H - 1, 7);
 
 	LCD_SetPositionXY(LCD_ROW2, LCD_PAGE1);
-	fprintf(&LCD_Stream, "Temp %02u:%02u", Thermostat->Parameters->Program[Thermostat->SubMenu_i].Time[Time_Start_Hour_Program] , Thermostat->Parameters->Program[Thermostat->SubMenu_i].Time[Time_Start_Min_Program]);
+	fprintf(&LCD_Stream, "Time %02u:%02u", Thermostat->Parameters->Program[Thermostat->SubMenu_i].Time[Time_Start_Hour_Program] , Thermostat->Parameters->Program[Thermostat->SubMenu_i].Time[Time_Start_Min_Program]);
 	LCD_DrawChar(0x7E);
 	fprintf(&LCD_Stream, "%02u:%02u", Thermostat->Parameters->Program[Thermostat->SubMenu_i].Time[Time_Stop_Hour_Program] , Thermostat->Parameters->Program[Thermostat->SubMenu_i].Time[Time_Stop_Min_Program]);
 	LCD_SetPosition(DRAW_TIME_START_HOUR + 1);

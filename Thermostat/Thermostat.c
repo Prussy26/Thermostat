@@ -13,6 +13,7 @@
 #include "Regulator.h"
 #include "Encoder.h"
 #include "EEPROM.h"
+#include "USART.h"
 #include "LCD.h"
 #include "Draw.h"
 
@@ -30,6 +31,7 @@ uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN 
 	 RTC_Init();
 	 Encoder_Init();
 	 LCD_Init();
+	 USART_Init(38400);
 	 
 	 RTC_SetSQ(RTC_SQ_1Hz);
 	 
@@ -45,12 +47,16 @@ uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN 
 
  void Periodic_Tasks_Set(uint8_t *Time)
  {
+	 Time[Date]--;
+	 Time[Month]--;
 	 for(uint8_t i = 0 ; i <= RTC_SIZE_FULL_TIME ; i++)
 	 {
 		 if(Time[i] == 0)
 		 PTR |= (1<<(i+2));
 		 else if(i != Day) break;
 	 }
+	 Time[Date]++;
+	 Time[Month]++;
  }
 
  void Periodic_Tasks_Run(Thermostat_t *Thermostat)
@@ -101,7 +107,7 @@ uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN 
 		Draw_Day(Thermostat->Time);
 		Draw_Date(Thermostat->Time);
 			
-		ProgramDailyCheck(Thermostat);
+		ProgramCheck(Thermostat);
 			 
 		CLR_BIT(PTR,PTRDAY); // Task Done
 		}
@@ -222,19 +228,18 @@ void Program(Thermostat_t *Thermostat)
 
 }
 
-void ProgramDailyCheck(Thermostat_t *Thermostat)
+void ProgramCheck(Thermostat_t *Thermostat)
 {
 	uint8_t PartOfWeek = WorkDays;
 			 
-	if(Thermostat->Time[Day] == Monday) // WorkDays
+	if((Thermostat->Time[Day] >= Monday) && (Thermostat->Time[Day] <= Friday)) // WorkDays
 	{
-		PartOfWeek = WorkDays; 
+		PartOfWeek = WorkDays;
 	}
-	else if(Thermostat->Time[Day] == Saturday) // Weekend
+	else if((Thermostat->Time[Day] == Saturday) && (Thermostat->Time[Day] == Sunday))  // Weekend
 	{
-		PartOfWeek = Weekend; 
+		PartOfWeek = Weekend;
 	}
-	else return;
 			
 	if(Thermostat->Parameters->Program_Mode == Auto)
 	{
@@ -294,7 +299,7 @@ void Save_Regulator(const Thermostat_t *Thermostat)
 }
 
 /*Save Program Parameters to EEPROM*/
-void Save_Program(const Thermostat_t *Thermostat)
+void Save_Program(Thermostat_t *Thermostat)
 {
 	if(Thermostat->Parameters->Program_Mode > Auto)
 	{
@@ -325,6 +330,7 @@ void Save_Program(const Thermostat_t *Thermostat)
 			}
 		}
 	}
+	ProgramCheck(Thermostat);
 	
 	EEPROM_Write(MEMPOS_PROGRAM, (uint8_t *)&Thermostat->Parameters->Program_Mode , MEMSIZE_PROGRAM);
 }
@@ -935,7 +941,7 @@ void ModeSetState(Thermostat_t *Thermostat)
 		break;
 		
 		case Shift_Left:
-		if (Thermostat->Set_i > On)
+		if (Thermostat->Set_i > Off)
 		{
 			Thermostat->Parameters->Regulator.Mode = --Thermostat->Set_i;
 			Draw_Mode(Thermostat);
@@ -943,7 +949,7 @@ void ModeSetState(Thermostat_t *Thermostat)
 		break;
 		
 		case Shift_Right:
-		if (Thermostat->Set_i < Off)
+		if (Thermostat->Set_i < Cooling_Only)
 		{
 			Thermostat->Parameters->Regulator.Mode = ++Thermostat->Set_i;
 			Draw_Mode(Thermostat);
@@ -1033,9 +1039,12 @@ void BrightnessSetState(Thermostat_t *Thermostat)
 		break;
 		 
 		case Shift_Left:
-		if (Thermostat->Parameters->Brightness >= 10)
+		if (Thermostat->Parameters->Brightness >= 2)
 			{
-				Thermostat->Parameters->Brightness -= 10;
+				if(Thermostat->Parameters->Brightness <= 11)
+					Thermostat->Parameters->Brightness = 1;
+				else
+					Thermostat->Parameters->Brightness -= 10;				
 				LCD_SetBrightness(Thermostat->Parameters->Brightness);
 				Draw_Brightness(Thermostat->Parameters->Brightness);
 				LCD_SetPosition(DRAW_BRIGHTNESS + 2);
@@ -1043,9 +1052,12 @@ void BrightnessSetState(Thermostat_t *Thermostat)
 		break;
 		 
 		case Shift_Right:
-			if (Thermostat->Parameters->Brightness <= 90) // Max 100%
+			if (Thermostat->Parameters->Brightness <= 99) // Max 100%
 			{
-				Thermostat->Parameters->Brightness += 10;
+				if(Thermostat->Parameters->Brightness > 90)
+					Thermostat->Parameters->Brightness = 100;
+				else
+					Thermostat->Parameters->Brightness += 10;
 				LCD_SetBrightness(Thermostat->Parameters->Brightness);
 				Draw_Brightness(Thermostat->Parameters->Brightness);
 				LCD_SetPosition(DRAW_BRIGHTNESS + 2);

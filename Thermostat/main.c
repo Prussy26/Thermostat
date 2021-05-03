@@ -12,6 +12,8 @@
 #include "Bit.h"
 
 #include "Thermostat.h"
+#include "USART.h"
+
 
 int main(void)
 {
@@ -50,6 +52,7 @@ int main(void)
     {	
 		Periodic_Tasks_Run(Thermostat_p);		
 		Control(Thermostat_p);
+		USART_CommandSet(Thermostat_p);
 		
 		//set_sleep_mode(SLEEP_MODE_PWR_DOWN);
 		//cli();

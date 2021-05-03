@@ -71,8 +71,9 @@ const uint8_t Encoder_StateTable [7][4] = {
 typedef struct Encoder_t 
 {
 	uint8_t ENCSR;				// Encoder State Register
-	uint8_t State;		// EncoderState
-	uint32_t PrevTime;	// Previous Encoder Tick Time
+	uint8_t State;				// EncoderState
+	uint32_t PrevTime;			// Previous Encoder Tick Time
+	uint32_t PrevButtonTime;	// Previous Button Interrupt Time
 } Encoder_t;
 
 Encoder_t Encoder = { .ENCSR = (1<<ENCEN) | (1<<ENCSEN) , .State = ENCODER_START , .PrevTime = 0 };
@@ -146,7 +147,7 @@ uint8_t Encoder_Get(void)
 		CLR_BIT(Encoder.ENCSR,ENCSP);
 		return Short_Press;
 	}
-	if((millis() >= (Encoder.PrevTime + LONG_PRESS_TIME)) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
+	if((millis() >= (Encoder.PrevButtonTime + LONG_PRESS_TIME)) && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0))
 	{
 		CLR_BIT(Encoder.ENCSR,ENCPEN);
 		return Long_Press;
@@ -174,6 +175,7 @@ void Encoder_millisCheck(void) // Overflow protection reset
 	if(millis() < Encoder.PrevTime) 
 	{
 		Encoder.PrevTime = 0;
+		Encoder.PrevButtonTime = 0;
 	}
 }
 
@@ -211,7 +213,7 @@ ISR(PCINT0_vect)
 
 ISR(PCINT1_vect)
 {	
-	if(millis() >= (Encoder.PrevTime + DEBOUNC_TIME_BUTTON))
+	if(millis() >= (Encoder.PrevButtonTime + DEBOUNC_TIME_BUTTON))
 	{	
 		cli();	 	
 		if((GET_BIT(Encoder.ENCSR,ENCPBS) == 0) && (GET_BIT(Encoder.ENCSR,ENCPEN) == 0)) // Button is Pushed
@@ -219,13 +221,14 @@ ISR(PCINT1_vect)
 			SET_BIT(Encoder.ENCSR,ENCPEN);			// Enable Press Functionality
 		}
 		/*If Released before Long Press then its Short Press*/
-		else if(millis() <= (Encoder.PrevTime + LONG_PRESS_TIME)) // && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0) && (GET_BIT(Encoder.ENCSR,ENCPBS) != 0))
+		else if(millis() <= (Encoder.PrevButtonTime + LONG_PRESS_TIME)) // && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0) && (GET_BIT(Encoder.ENCSR,ENCPBS) != 0))
 		{
 			SET_BIT(Encoder.ENCSR,ENCSP);  // Set Short Press Flag
 			CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
 		}
 		ReadButton(); 
 		if((GET_BIT(Encoder.ENCSR,ENCPBS) == 0)) CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
+		Encoder.PrevButtonTime = millis();
 		Encoder.PrevTime = millis();
 		sei();	
 	}	

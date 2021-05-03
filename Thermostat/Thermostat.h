@@ -104,7 +104,7 @@ void Control(Thermostat_t *Thermostat);
 void Program(Thermostat_t *Thermostat);
 
 /*Sets program for next day at midnight*/
-void ProgramDailyCheck(Thermostat_t *Thermostat);
+void ProgramCheck(Thermostat_t *Thermostat);
 
 /*Save Thermistor Parameters to EEPROM*/
 void Save_Thermistor(const Thermostat_t *Thermostat);
@@ -113,7 +113,7 @@ void Save_Thermistor(const Thermostat_t *Thermostat);
 void Save_Regulator(const Thermostat_t *Thermostat);
 
 /*Save Regulator Parameters to EEPROM*/
-void Save_Program(const Thermostat_t *Thermostat);
+void Save_Program(Thermostat_t *Thermostat);
 
 /*Save Brightness to EEPROM*/
 void Save_Brightness(const Thermostat_t *Thermostat);
