@@ -154,14 +154,24 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 		{
 			uint16_t x = 0;
 			
-			case 't':
+			case CMD_INFO:
+				//fprintf(&USART_Stream, "%02u.", Thermostat->Temperature / 10);
+				//fprintf(&USART_Stream, "%1u C      ", Thermostat->Temperature - (Thermostat->Temperature / 10) * 10);
+				//fprintf(&USART_Stream, "%02u:%02u\n", Thermostat->Time[Hour], Thermostat->Time[Min]);
+				//fprintf(&USART_Stream, "%02u.", Thermostat->Parameters->Regulator.Temperature / 10);
+				//fprintf(&USART_Stream, "%1u C   ", Thermostat->Parameters->Regulator.Temperature - (Thermostat->Parameters->Regulator.Temperature / 10) * 10);
+				//fprintf(&USART_Stream, "%s %02u.%02u.20%02u\n", Day_Text[Thermostat->Time[Day]], Thermostat->Time[Date], Thermostat->Time[Month], Thermostat->Time[Year]);
+			break;
+						
+			case CMD_TEMP:
 				string_Float2uInt(Value);
 				sscanf(Value, "%3u", &x);		
 				if((x >= 100) && (x <= 300))
 				{
 					Thermostat->Parameters->Thermistor.Offset = x - Thermistor_GetTemperatureX10(&Thermostat->Parameters->Thermistor ,ADCP1) + Thermostat->Parameters->Thermistor.Offset;
+					Thermostat->Temperature = x;					
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_TEMPSET:
@@ -172,7 +182,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Regulator.Temperature = x;
 					Draw_STemp(Thermostat->Parameters->Regulator.Temperature);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_ACT_MIN:			
@@ -183,7 +193,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					RTC_SetTime(Thermostat->Time);
 					SET_BIT(PTR,PTRMIN);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_ACT_HOUR:			
@@ -194,7 +204,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					RTC_SetTime(Thermostat->Time);
 					SET_BIT(PTR,PTRHOUR);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_ACT_DAY:			
@@ -207,14 +217,14 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 				}
 				else 
 				{
-					response = INCORRECT_FORMAT;
+					response = INCORRECT_RANGE;
 					fprintf(&USART_Stream, "\n1. Monday\n");
 					fprintf(&USART_Stream, "2. Tuesday\n");
 					fprintf(&USART_Stream, "3. Wednesday\n");
 					fprintf(&USART_Stream, "4. Thursday\n");
 					fprintf(&USART_Stream, "5. Friday\n");
 					fprintf(&USART_Stream, "6. Saturday\n");
-					fprintf(&USART_Stream, "7. Sunday");
+					fprintf(&USART_Stream, "7. Sunday\n");
 				}
 			break;
 			
@@ -226,7 +236,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					RTC_SetTime(Thermostat->Time);
 					SET_BIT(PTR,PTRDAY);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_ACT_MOUNTH:			
@@ -237,7 +247,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					RTC_SetTime(Thermostat->Time);
 					SET_BIT(PTR,PTRMONTH);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_ACT_YEAR:			
@@ -248,7 +258,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					RTC_SetTime(Thermostat->Time);
 					SET_BIT(PTR,PTRYEAR);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_REGMODE:			
@@ -260,11 +270,11 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 				}
 				else 
 				{
-					response = INCORRECT_FORMAT;
+					response = INCORRECT_RANGE;
 					fprintf(&USART_Stream, "\n0. Off\n");
 					fprintf(&USART_Stream, "1. On\n");
 					fprintf(&USART_Stream, "2. Heating Only\n");
-					fprintf(&USART_Stream, "3. Cooling Only");
+					fprintf(&USART_Stream, "3. Cooling Only\n");
 				}
 					
 			break;
@@ -277,7 +287,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Thermistor.Offset = 0;
 					Save_Thermistor(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_THERMISTOR_R0:			
@@ -288,7 +298,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Thermistor.Offset = 0;
 					Save_Thermistor(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_HYSTERESIS:	
@@ -299,7 +309,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Regulator.Hysteresis = x;
 					Save_Regulator(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_BRIGHTNESS:	
@@ -310,7 +320,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					LCD_SetBrightness(Thermostat->Parameters->Brightness);
 					Save_Brightness(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROGMODE:	
@@ -322,9 +332,9 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 				}
 				else 
 				{
-					response = INCORRECT_FORMAT;
+					response = INCORRECT_RANGE;
 					fprintf(&USART_Stream, "\n1. Manual\n");
-					fprintf(&USART_Stream, "2. Auto");		
+					fprintf(&USART_Stream, "2. Auto\n");		
 				}
 			break;
 			
@@ -336,7 +346,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[WorkDays].Temp[Temp_H_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROG_WORK_TEMP_L:
@@ -347,7 +357,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[WorkDays].Temp[Temp_L_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROG_WORK_START_TIME_MIN:	
@@ -357,7 +367,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[WorkDays].Time[Time_Start_Min_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROG_WORK_START_TIME_HOUR:	
@@ -367,7 +377,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[WorkDays].Time[Time_Start_Hour_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROG_WORK_STOP_TIME_MIN:	
@@ -377,7 +387,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[WorkDays].Time[Time_Stop_Min_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROG_WEND_TEMP_H:
@@ -388,7 +398,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[Weekend].Temp[Temp_H_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROG_WEND_TEMP_L:
@@ -399,7 +409,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[Weekend].Temp[Temp_L_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROG_WEND_START_TIME_MIN:	
@@ -409,7 +419,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[Weekend].Time[Time_Start_Min_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROG_WEND_START_TIME_HOUR:	
@@ -419,7 +429,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[Weekend].Time[Time_Start_Hour_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 			
 			case CMD_PROG_WEND_STOP_TIME_MIN:	
@@ -429,7 +439,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[Weekend].Time[Time_Stop_Min_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 				
 			case CMD_PROG_WEND_STOP_TIME_HOUR:	
@@ -439,7 +449,7 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 					Thermostat->Parameters->Program[Weekend].Time[Time_Stop_Hour_Program] = x;
 					Save_Program(Thermostat);
 				}
-				else response = INCORRECT_FORMAT;
+				else response = INCORRECT_RANGE;
 			break;
 										
 			default:
@@ -450,12 +460,22 @@ void USART_CommandSet(Thermostat_t *Thermostat)
 	
 	if (response == CORRECT_FORMAT)
 	{
-		fprintf(&USART_Stream, "\nCorrect\n\n");
+		//fprintf(&USART_Stream, "Correct\n");
+		fprintf(&USART_Stream, "%02u.", Thermostat->Temperature / 10);
+		fprintf(&USART_Stream, "%1u C      ", Thermostat->Temperature - (Thermostat->Temperature / 10) * 10);
+		fprintf(&USART_Stream, "%02u:%02u\n", Thermostat->Time[Hour], Thermostat->Time[Min]);
+		fprintf(&USART_Stream, "%02u.", Thermostat->Parameters->Regulator.Temperature / 10);
+		fprintf(&USART_Stream, "%1u C   ", Thermostat->Parameters->Regulator.Temperature - (Thermostat->Parameters->Regulator.Temperature / 10) * 10);
+		fprintf(&USART_Stream, "%s %02u.%02u.20%02u\n\n", Day_Text[Thermostat->Time[Day]], Thermostat->Time[Date], Thermostat->Time[Month], Thermostat->Time[Year]);
 	}
 	else if (response == INCORRECT_FORMAT)
 	{
-		fprintf(&USART_Stream, "\nWrong command\n\n");
+		fprintf(&USART_Stream, "INCORRECT COMMAND!\n\n"); 
 	}	
+	else if (response == INCORRECT_RANGE)
+	{
+		fprintf(&USART_Stream, "OUT OF RANGE!\n\n");
+	}
 }
 
 FILE USART_Stream = FDEV_SETUP_STREAM(USART_Putchar, NULL, _FDEV_SETUP_WRITE);

@@ -14,6 +14,8 @@
 
 
 /* Defining USART protocol commands*/
+#define CMD_INFO			'i'
+
 #define CMD_TEMP			't'
 #define CMD_TEMPSET			'T'
 
@@ -25,7 +27,7 @@
 #define CMD_ACT_YEAR		'Y'
 
 #define CMD_REGMODE			'O'
-#define CMD_HYSTERESIS		'i'
+#define CMD_HYSTERESIS		'H'
 
 #define CMD_THERMISTOR_BETA	'B'
 #define CMD_THERMISTOR_R0	'0'
@@ -53,7 +55,7 @@
 #define NO_COMMAND			0
 #define CORRECT_FORMAT		1
 #define INCORRECT_FORMAT	2
-
+#define INCORRECT_RANGE		3
 
 
 void USART_Init(const uint32_t baud); // Initializing USART with specific Baud rate

@@ -18,7 +18,7 @@
 
 /*Defining de-bouncing Times*/
 #define DEBOUNC_TIME_ENCODER 5 // 5 ms
-#define DEBOUNC_TIME_BUTTON 15 // 10 ms
+#define DEBOUNC_TIME_BUTTON 10 // 10 ms
 #define LONG_PRESS_TIME 500 // 500 ms
 #define TIMEOUT 10000 // 10 s
 
@@ -218,16 +218,17 @@ ISR(PCINT1_vect)
 		cli();	 	
 		if((GET_BIT(Encoder.ENCSR,ENCPBS) == 0) && (GET_BIT(Encoder.ENCSR,ENCPEN) == 0)) // Button is Pushed
 		{
-			SET_BIT(Encoder.ENCSR,ENCPEN);			// Enable Press Functionality
+			SET_BIT(Encoder.ENCSR,ENCPEN);	// Enable Press Functionality
 		}
 		/*If Released before Long Press then its Short Press*/
-		else if(millis() <= (Encoder.PrevButtonTime + LONG_PRESS_TIME)) // && (GET_BIT(Encoder.ENCSR,ENCPEN) != 0) && (GET_BIT(Encoder.ENCSR,ENCPBS) != 0))
+		else if(millis() <= (Encoder.PrevButtonTime + LONG_PRESS_TIME))
 		{
-			SET_BIT(Encoder.ENCSR,ENCSP);  // Set Short Press Flag
-			CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
+			SET_BIT(Encoder.ENCSR,ENCSP);	// Set Short Press Flag
+			CLR_BIT(Encoder.ENCSR,ENCPEN);	// Clear Press Enable Bit
 		}	
 			 
-		if(ReadButton() == 0) CLR_BIT(Encoder.ENCSR,ENCPEN); // Clear Press Enable Bit
+		ReadButton(); // Clear Press Enable Bit
+
 		Encoder.PrevButtonTime = millis();
 		Encoder.PrevTime = millis();
 		sei();	

@@ -54,7 +54,6 @@ char Mode_Text[Mode_Size][10] = {
 	"       On\0",
 	"Heat only\0",
 	"Cool only\0"
-	
 };
 
 

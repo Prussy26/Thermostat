@@ -40,7 +40,7 @@
 
 extern uint8_t Time_Position[5];
 
-
+extern char Day_Text[7][3];
 
 enum Icon { No_Icon, Cooling_Icon, Heating_Icon , Error_Icon};
 	

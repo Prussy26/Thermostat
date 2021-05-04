@@ -281,7 +281,7 @@ void Save_Thermistor(const Thermostat_t *Thermostat)
 /*Save Regulator Parameters to EEPROM*/
 void Save_Regulator(const Thermostat_t *Thermostat)
 {
-	if(Thermostat->Parameters->Regulator.Mode > Off)
+	if(Thermostat->Parameters->Regulator.Mode > Cooling_Only)
 	{
 		Thermostat->Parameters->Regulator.Mode = On;
 	}
