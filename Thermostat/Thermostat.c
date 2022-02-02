@@ -67,12 +67,13 @@ uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN 
 		Encoder_millisCheck(); // Overflow protection of millis
 		 
 		if(GET_BIT(PTR,PTREN) == 0)
-		CLR_BIT(PTR,PTRSEC); // Task Done
+			CLR_BIT(PTR,PTRSEC); // Task Done
 	}
 	 
 	/*If Periodic Tasks are enabled*/
 	if(GET_BIT(PTR,PTREN) != 0)
 	{
+		
 		// Every Second Task
 		if(GET_BIT(PTR,PTRSEC) != 0)
 		{
@@ -87,6 +88,7 @@ uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN 
 			 			 
 			CLR_BIT(PTR,PTRSEC); // Task Done
 		}
+		
 		// Every Minute Task
 		if(GET_BIT(PTR,PTRMIN) != 0)
 		{
@@ -96,43 +98,47 @@ uint8_t Program_TimePossition[4] = { DRAW_TIME_START_HOUR , DRAW_TIME_START_MIN 
 			 
 			CLR_BIT(PTR,PTRMIN); // Task Done
 		}
+		
 		// Every Hour Task
 		if(GET_BIT(PTR,PTRHOUR) != 0)
 		{
 			Draw_Hours(Thermostat->Time);
 			CLR_BIT(PTR,PTRHOUR); // Task Done
 		}
+		
 		// Every Day Task
 		if(GET_BIT(PTR,PTRDAY) != 0)
 		{
-		Draw_Day(Thermostat->Time);
-		Draw_Date(Thermostat->Time);
+			Draw_Day(Thermostat->Time);
+			Draw_Date(Thermostat->Time);
 			
-		ProgramCheck(Thermostat);
+			ProgramCheck(Thermostat);
 			 
-		CLR_BIT(PTR,PTRDAY); // Task Done
+			CLR_BIT(PTR,PTRDAY); // Task Done
 		}
+		
 		// Every Week Task
 		if(GET_BIT(PTR,PTRWEEK) != 0)
 		{			 
 			//Draw_Week(Time);
 			CLR_BIT(PTR,PTRWEEK); // Task Done
 		}
+		
 		// Every Month Task
 		if(GET_BIT(PTR,PTRMONTH) != 0)
 		{
 			Draw_Month(Thermostat->Time);
 			CLR_BIT(PTR,PTRMONTH); // Task Done
 		}
+		
 		// Every Year Task
 		if(GET_BIT(PTR,PTRYEAR) != 0)
 		{
 			//Draw_Year(Thermostat->Time);
 			CLR_BIT(PTR,PTRYEAR); // Task Done
 		}
- 
 	}
- }
+}
 
 /*Transmission between states*/
  void Control(Thermostat_t *Thermostat)

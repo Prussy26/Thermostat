@@ -227,7 +227,7 @@ ISR(PCINT1_vect)
 			CLR_BIT(Encoder.ENCSR,ENCPEN);	// Clear Press Enable Bit
 		}	
 			 
-		ReadButton(); // Clear Press Enable Bit
+		ReadButton(); // Read Button state
 
 		Encoder.PrevButtonTime = millis();
 		Encoder.PrevTime = millis();
